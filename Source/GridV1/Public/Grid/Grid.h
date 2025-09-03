@@ -27,25 +27,24 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMaterialInterface> GridMaterial;
 
+
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	FVector GridCenter;
+
+	//UPROPERTY()
+	FVector GridBottomLeftCornerLocation;
+
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	FVector GridTileSize;
+
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	FVector2D GridTileCount;
+
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	EGridShape GridShape;
+
 	UFUNCTION()
 	void SpawnGrid();
 
-	UPROPERTY()
-	FVector GridCenter;
-
-	UPROPERTY()
-	FVector GridBottomLeftCornerLocation;
-
-	UPROPERTY()
-	FVector GridTileSize;
-
-	UPROPERTY()
-	FVector2D GridTileCount;
-
-	UPROPERTY()
-	EGridShape GridShape;
-
 	void SetGridInfo();
-
-	void SetGridBottomLeftCornerLocation();
 };

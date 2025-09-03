@@ -14,21 +14,30 @@ AGrid::AGrid()
 	bReplicates = true;
 	GridMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridMesh"));
 	GridMesh->SetupAttachment(GetRootComponent());
+
+	GridCenter = FVector::ZeroVector;
 }
 
 // Called when the game starts or when spawned
 void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SetGridInfo();
 	SpawnGrid();
 }
 
 void AGrid::SpawnGrid()
 {
-	if (!HasAuthority()) return;
-
-	SetGridInfo();
+	GridMesh->ClearInstances();
+	for (int32 i = 0; i < GridTileCount.X; i++)
+	{
+		for (int32 j = 0; j < GridTileCount.Y; j++)
+		{
+			const FVector InstanceLocation = FVector(GridBottomLeftCornerLocation.X + (i * GridTileSize.X) + (GridTileSize.X / 2), GridBottomLeftCornerLocation.Y + (j * GridTileSize.Y) + (GridTileSize.Y / 2), GridBottomLeftCornerLocation.Z);
+			const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, InstanceLocation, FVector(1.f, 1.f, 1.f));
+			GridMesh->AddInstance(InstanceTransform);
+		}
+	}
 
 }
 
@@ -42,15 +51,11 @@ void AGrid::SetGridInfo()
 
 	GridMesh->SetStaticMesh(FoundGridInfo.FlatMesh);
 	GridMesh->SetMaterial(0, FoundGridInfo.FlatBorderMaterial);
-	//TileSize = FoundGridInfo.MeshSize;
+	GridTileSize = FoundGridInfo.MeshSize;
 
 	GridBottomLeftCornerLocation = GridCenter - FVector(GridTileSize.X * (GridTileCount.X / 2), GridTileSize.Y * (GridTileCount.Y / 2), 0.f);
 
 }
 
-void AGrid::SetGridBottomLeftCornerLocation()
-{
-	
-}
 
 
