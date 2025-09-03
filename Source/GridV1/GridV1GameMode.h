@@ -13,6 +13,12 @@ class AGridV1GameMode : public AGameModeBase
 
 public:
 	AGridV1GameMode();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid")
+	TObjectPtr<UDataAsset> GridInfo;
+
+private:
+
 };
 
 

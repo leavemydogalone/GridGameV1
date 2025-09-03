@@ -7,13 +7,23 @@
 #include "GameplayTagContainer.h"
 #include "GridShapeInfo.generated.h"
 
+UENUM(BlueprintType)
+enum class EGridShape : uint8
+{
+	Square		UMETA(DisplayName = "Square"),
+	Hexagon		UMETA(DisplayName = "Hexagon")
+};
+
 USTRUCT(BlueprintType)
-struct FGridShapeData
+struct FGridInfo
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag GridTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EGridShape GridShape = EGridShape::Square;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector MeshSize = FVector(100.f, 100.f, 100.f);
@@ -45,8 +55,8 @@ class GRIDV1_API UGridShapeInfo : public UDataAsset
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GridInformation")
-	TArray<FGridShapeData> GridInformation;
+	TArray<FGridInfo> GridInformation;
 
-	FGridShapeData FindGridInfoForTag(const FGameplayTag& GridTag, bool bLogNotFound = false) const;
+	FGridInfo FindGridInfoForTag(const EGridShape& GridShape, bool bLogNotFound = false) const;
 	
 };
