@@ -15,6 +15,8 @@ class GRIDV1_API AGrid : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGrid();
+	
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,20 +30,19 @@ private:
 	TObjectPtr<UMaterialInterface> GridMaterial;
 
 
-	UPROPERTY(EditAnywhere, Category = "Grid")
+	//UPROPERTY(EditAnywhere, Category = "Grid")
 	FVector GridCenter;
 
-	//UPROPERTY()
 	FVector GridBottomLeftCornerLocation;
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
-	FVector GridTileSize;
+	FVector GridTileSize = FVector(100.f, 100.f, 0.f);
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
-	FVector2D GridTileCount;
+	FVector2D GridTileCount = FVector2D(10, 10);
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
-	EGridShape GridShape;
+	EGridShape GridShape = EGridShape::Square;
 
 	UFUNCTION()
 	void SpawnGrid();

@@ -25,6 +25,7 @@ struct FGridInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EGridShape GridShape = EGridShape::Square;
 
+	// Update the size of the mesh if it is different than the default 100x100x100
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector MeshSize = FVector(100.f, 100.f, 100.f);
 

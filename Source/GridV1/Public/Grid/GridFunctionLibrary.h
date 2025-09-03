@@ -19,4 +19,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static UGridShapeInfo* GetGridInfo(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static FVector SnapVectorToVector(FVector V1, FVector V2);
+
 };

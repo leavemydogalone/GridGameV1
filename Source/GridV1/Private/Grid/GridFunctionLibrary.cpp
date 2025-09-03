@@ -5,6 +5,7 @@
 #include "Grid/Data/GridShapeInfo.h"
 #include "Game/GridV1GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 UGridShapeInfo* UGridFunctionLibrary::GetGridInfo(const UObject* WorldContextObject)
@@ -18,4 +19,13 @@ UGridShapeInfo* UGridFunctionLibrary::GetGridInfo(const UObject* WorldContextObj
 	return GridV1GameModeBase->GridInfo;
 
 
+}
+
+FVector UGridFunctionLibrary::SnapVectorToVector(FVector V1, FVector V2)
+{
+	float SnappedX = UKismetMathLibrary::GridSnap_Float(V1.X, V2.X);
+	float SnappedY = UKismetMathLibrary::GridSnap_Float(V1.Y, V2.Y);
+	float SnappedZ = UKismetMathLibrary::GridSnap_Float(V1.Z, V2.Z);
+
+	return FVector(SnappedX, SnappedY, SnappedZ);
 }
