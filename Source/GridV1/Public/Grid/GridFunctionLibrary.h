@@ -22,4 +22,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FVector SnapVectorToVector(FVector V1, FVector V2);
 
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static bool IsFloatEven(float InFloat);
+
 };

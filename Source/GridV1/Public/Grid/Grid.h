@@ -23,7 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "Grid")
 	TObjectPtr<UInstancedStaticMeshComponent> GridMesh;
 
 	UPROPERTY()
@@ -31,7 +31,7 @@ private:
 
 
 	//UPROPERTY(EditAnywhere, Category = "Grid")
-	FVector GridCenter;
+	FVector GridCenter = FVector::ZeroVector;
 
 	FVector GridBottomLeftCornerLocation;
 
@@ -47,5 +47,14 @@ private:
 	UFUNCTION()
 	void SpawnGrid();
 
-	void SetGridInfo();
+	void SetUpGrid();
+
+	void SetGridMeshInfo();
+
+	void SetGridCenterAndBottomLeft();
+
+	void SpawnHexagonalGrid();
+
+	void SpawnSquareGrid();
+	//float 
 };

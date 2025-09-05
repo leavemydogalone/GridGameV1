@@ -29,3 +29,8 @@ FVector UGridFunctionLibrary::SnapVectorToVector(FVector V1, FVector V2)
 
 	return FVector(SnappedX, SnappedY, SnappedZ);
 }
+
+bool UGridFunctionLibrary::IsFloatEven(float InFloat)
+{
+	return FMath::IsNearlyZero(FMath::Fmod(InFloat, 2.0f));
+}
