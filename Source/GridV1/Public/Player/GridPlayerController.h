@@ -39,6 +39,9 @@ protected:
 	//void OnSetActionReleased();
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputMappingContext> GridV1Context;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UGridV1InputConfig> InputConfig;
 
