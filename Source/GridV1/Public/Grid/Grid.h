@@ -44,6 +44,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	EGridShape GridShape = EGridShape::Square;
 
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	bool UseEnvironment = false;
+
 	UFUNCTION()
 	void SpawnGrid();
 
@@ -56,5 +59,6 @@ private:
 	void SpawnHexagonalGrid();
 
 	void SpawnSquareGrid();
-	//float 
+	
+
 };

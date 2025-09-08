@@ -25,4 +25,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static bool IsFloatEven(float InFloat);
 
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static FVector TraceForGround(FVector StartLocation, bool HitSomething, FVector GridTileSize, UObject* WorldContextObject);
 };

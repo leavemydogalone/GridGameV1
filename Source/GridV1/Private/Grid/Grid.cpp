@@ -32,61 +32,6 @@ void AGrid::BeginPlay()
 	SpawnGrid();
 }
 
-// A second function should be created for hexagon and square
-
-void AGrid::SpawnGrid()
-{
-	GridMesh->ClearInstances();
-
-	//Round the tile count to nearest whole number
-	GridTileCount.X = FMath::RoundToInt(GridTileCount.X);
-	GridTileCount.Y = FMath::RoundToInt(GridTileCount.Y);
-
-	if (GridShape == EGridShape::Hexagon) {
-		SpawnHexagonalGrid();
-	}
-	else if (GridShape == EGridShape::Square) {
-		SpawnSquareGrid();
-	}
-
-
-	////Hexagon
-	//int32 NumRows = GridTileCount.Y;
-	//if (GridShape == EGridShape::Hexagon)
-	//{
-	//	NumRows = GridTileCount.Y * 2;
-	//}
-
-	//for (int32 i = 0; i < GridTileCount.X; i++)
-	//{
-	//	for (int32 j = 0; j < NumRows; j++)
-	//	{
-	//		float XOffset = static_cast<float>(i);
-	//		float YOffset = static_cast<float>(j);
-
-	//		if (GridShape == EGridShape::Hexagon)
-	//		{
-	//			XOffset = i * 0.75f;
-	//			YOffset = j + (i % 2) * 0.5f;
-
-	//		}
-	//		const FVector InstanceLocation = FVector(
-	//			GridBottomLeftCornerLocation.X + (XOffset * GridTileSize.X) + (GridTileSize.X / 2),
-	//			GridBottomLeftCornerLocation.Y + (YOffset * GridTileSize.Y) + (GridTileSize.Y / 2),
-	//			GridBottomLeftCornerLocation.Z
-	//		);
-	//		const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, InstanceLocation, FVector(1.f, 1.f, 1.f));
-
-	//		GridMesh->AddInstanceWorldSpace(InstanceTransform);
-
-	//		if (GridShape == EGridShape::Hexagon){
-	//			j++;
-	//		}
-
-	//	}
-	//}
-
-}
 
 void AGrid::SetUpGrid()
 {
@@ -158,9 +103,23 @@ void AGrid::SetGridCenterAndBottomLeft()
 
 }
 
+void AGrid::SpawnGrid()
+{
+	GridMesh->ClearInstances();
+
+	GridTileCount.X = FMath::RoundToInt(GridTileCount.X);
+	GridTileCount.Y = FMath::RoundToInt(GridTileCount.Y);
+
+	if (GridShape == EGridShape::Hexagon) {
+		SpawnHexagonalGrid();
+	}
+	else if (GridShape == EGridShape::Square) {
+		SpawnSquareGrid();
+	}
+}
+
 void AGrid::SpawnHexagonalGrid()
 {
-
 	for (int32 i = 0; i < GridTileCount.X; i++)
 	{
 		int32 FirstIndexOfRow = i % 2;

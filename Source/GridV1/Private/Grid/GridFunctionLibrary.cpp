@@ -6,6 +6,8 @@
 #include "Game/GridV1GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GridV1/GridV1.h"
+#include "Engine/World.h"
 
 
 UGridShapeInfo* UGridFunctionLibrary::GetGridInfo(const UObject* WorldContextObject)
@@ -33,4 +35,39 @@ FVector UGridFunctionLibrary::SnapVectorToVector(FVector V1, FVector V2)
 bool UGridFunctionLibrary::IsFloatEven(float InFloat)
 {
 	return FMath::IsNearlyZero(FMath::Fmod(InFloat, 2.0f));
+}
+
+FVector UGridFunctionLibrary::TraceForGround(FVector StartLocation, bool HitSomething, FVector GridTileSize, UObject* WorldContextObject)
+{
+	TArray<FHitResult> OutHits;
+	FVector OutVector = FVector::ZeroVector;
+
+	if (!WorldContextObject) return OutVector;
+
+	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
+
+	if (WorldContextObject)
+	{
+		float ApproximateSizeOfTile = GridTileSize.X / 3;
+
+		bool bHit = World->SweepMultiByChannel(
+			/*OutHits=*/ OutHits,
+			/*Start=*/ StartLocation + FVector(0.f, 0.f, 1000.f),
+			/*End=*/ StartLocation - FVector(0.f, 0.f, 1000.f),
+			/*Quat=*/ FQuat::Identity,
+			/*TraceChannel=*/ ECC_Ground,
+			/*CollisionShape=*/ FCollisionShape::MakeSphere(ApproximateSizeOfTile)
+		);
+		if (bHit)
+		{
+			// Example: return the first hit location
+			OutVector = OutHits[0].ImpactPoint;
+			HitSomething = OutHits.Num() > 0;
+		}
+	}
+
+	//Note to self, in the video he uses the start locations x and y but uses the hit z
+	//He also snaps the z to the grid
+
+	return OutVector;
 }
