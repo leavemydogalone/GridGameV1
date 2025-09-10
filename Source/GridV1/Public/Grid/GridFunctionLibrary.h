@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Grid/Data/GridShapeInfo.h"
+#include "Grid/Data/GridTypes.h"
 #include "GridFunctionLibrary.generated.h"
 
 /**
@@ -27,4 +28,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FVector TraceForGround(FVector StartLocation, bool HitSomething, FVector GridTileSize, UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static FVector2D GetHexUnitVector(EHexDirection Dir);
 };

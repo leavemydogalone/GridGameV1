@@ -3,6 +3,7 @@
 
 #include "Grid/GridFunctionLibrary.h"
 #include "Grid/Data/GridShapeInfo.h"
+#include "Grid/Data/GridTypes.h"
 #include "Game/GridV1GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -70,4 +71,18 @@ FVector UGridFunctionLibrary::TraceForGround(FVector StartLocation, bool HitSome
 	//He also snaps the z to the grid
 
 	return OutVector;
+}
+
+FVector2D UGridFunctionLibrary::GetHexUnitVector(EHexDirection Dir)
+{
+	switch (Dir)
+	{
+	case EHexDirection::East:      return FVector2D(1, 0);
+	case EHexDirection::West:      return FVector2D(-1, 0);
+	case EHexDirection::Northeast: return FVector2D(0.5f, FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::Northwest: return FVector2D(-0.5f, FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::Southeast: return FVector2D(0.5f, -FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::Southwest: return FVector2D(-0.5f, -FMath::Sqrt(3.f) / 2.f);
+	default:                       return FVector2D::ZeroVector;
+	}
 }

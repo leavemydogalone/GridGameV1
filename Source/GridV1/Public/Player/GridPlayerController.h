@@ -34,9 +34,7 @@ protected:
 
 	virtual void SetupInputComponent() override;
 
-	//void OnInputStarted();
-	//void OnSetActionTriggered();
-	//void OnSetActionReleased();
+
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
