@@ -4,14 +4,15 @@
 
 #include "CoreMinimal.h"
 
+// Will need to convert this to left/right verbiage
 UENUM(BlueprintType)
 enum class EHexDirection : uint8
 {
-	None      UMETA(DisplayName = "None"),
-	East      UMETA(DisplayName = "East"),
-	West      UMETA(DisplayName = "West"),
-	Northeast UMETA(DisplayName = "Northeast"),
-	Northwest UMETA(DisplayName = "Northwest"),
-	Southeast UMETA(DisplayName = "Southeast"),
-	Southwest UMETA(DisplayName = "Southwest"),
+	None		UMETA(DisplayName = "None"),
+	Left		UMETA(DisplayName = "Left"),
+	Right		UMETA(DisplayName = "Right"),
+	UpRight		UMETA(DisplayName = "UpRight"),
+	UpLeft		UMETA(DisplayName = "UpLeft"),
+	DownRight	UMETA(DisplayName = "DownRight"),
+	DownLeft	UMETA(DisplayName = "DownLeft"),
 };

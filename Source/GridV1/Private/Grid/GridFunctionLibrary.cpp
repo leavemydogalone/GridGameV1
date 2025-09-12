@@ -8,8 +8,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GridV1/GridV1.h"
+#include "GridV1GameplayTags.h"
 #include "Engine/World.h"
-
+#include "NativeGameplayTags.h"
 
 UGridShapeInfo* UGridFunctionLibrary::GetGridInfo(const UObject* WorldContextObject)
 {
@@ -77,12 +78,41 @@ FVector2D UGridFunctionLibrary::GetHexUnitVector(EHexDirection Dir)
 {
 	switch (Dir)
 	{
-	case EHexDirection::East:      return FVector2D(1, 0);
-	case EHexDirection::West:      return FVector2D(-1, 0);
-	case EHexDirection::Northeast: return FVector2D(0.5f, FMath::Sqrt(3.f) / 2.f);
-	case EHexDirection::Northwest: return FVector2D(-0.5f, FMath::Sqrt(3.f) / 2.f);
-	case EHexDirection::Southeast: return FVector2D(0.5f, -FMath::Sqrt(3.f) / 2.f);
-	case EHexDirection::Southwest: return FVector2D(-0.5f, -FMath::Sqrt(3.f) / 2.f);
-	default:                       return FVector2D::ZeroVector;
+	case EHexDirection::Right:      return FVector2D(1, 0);
+	case EHexDirection::Left:		return FVector2D(-1, 0);
+	case EHexDirection::UpRight:	return FVector2D(0.5f, FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::UpLeft:		return FVector2D(-0.5f, FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::DownRight:	return FVector2D(0.5f, -FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::DownLeft:	return FVector2D(-0.5f, -FMath::Sqrt(3.f) / 2.f);
+	default:						return FVector2D::ZeroVector;
 	}
 }
+
+//FVector2D UGridFunctionLibrary::GetDirectionFromGameplayTag(FGameplayTag& GameplayTag)
+//{
+//	if (GameplayTag.MatchesTagExact(NativeGameplayTags::DirectionTags::TAG_Direction_Right))
+//	{
+//		return GetHexUnitVector(EHexDirection::Right);
+//	}
+//	if (GameplayTag.MatchesTagExact(NativeGameplayTags::DirectionTags::TAG_Direction_Left))
+//	{
+//		return GetHexUnitVector(EHexDirection::Left);
+//	}
+//	if (GameplayTag.MatchesTagExact(NativeGameplayTags::DirectionTags::TAG_Direction_UpRight))
+//	{
+//		return GetHexUnitVector(EHexDirection::UpRight);
+//	}
+//	if (GameplayTag.MatchesTagExact(NativeGameplayTags::DirectionTags::TAG_Direction_UpLeft))
+//	{
+//		return GetHexUnitVector(EHexDirection::UpLeft);
+//	}
+//	if (GameplayTag.MatchesTagExact(NativeGameplayTags::DirectionTags::TAG_Direction_DownRight))
+//	{
+//		return GetHexUnitVector(EHexDirection::DownRight);
+//	}
+//	if (GameplayTag.MatchesTagExact(NativeGameplayTags::DirectionTags::TAG_Direction_DownLeft))
+//	{
+//		return GetHexUnitVector(EHexDirection::DownLeft);
+//	}
+//	return FVector2D::ZeroVector;
+//}

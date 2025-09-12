@@ -48,10 +48,19 @@ void AGrid::SetGridMeshInfo()
 	const FGridInfo FoundGridInfo = GridInfo->FindGridInfoForTag(GridShape);
 	if (FoundGridInfo.Mesh == nullptr || FoundGridInfo.Material == nullptr) return;
 
+	TileScale = GridTileSize / FoundGridInfo.MeshSize;
+
 	GridMesh->SetStaticMesh(FoundGridInfo.FlatMesh);
+
+	/*UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(FoundGridInfo.FlatBorderMaterial, this);*/
+
+	//float ScaleFactorX = GridTileSize.X / FoundGridInfo.MeshSize.X;
+	//DynamicMaterial->SetScalarParameterValue(TEXT("TextureScale"), ScaleFactorX);
+
+	//GridMesh->SetMaterial(0, DynamicMaterial);
 	GridMesh->SetMaterial(0, FoundGridInfo.FlatBorderMaterial);
 
-	// This is to allow meshes that are of different sizes in the grid info. Will also need to set MeshSize in gridinfo
+
 	GridMesh->SetWorldScale3D(GridTileSize / FoundGridInfo.MeshSize);
 
 }
@@ -140,7 +149,7 @@ void AGrid::SpawnHexagonalGrid()
 				GridBottomLeftCornerLocation.Z
 			);
 
-			const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, InstanceLocation, FVector(1.f, 1.f, 1.f));
+			const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, InstanceLocation, TileScale);
 
 			GridMesh->AddInstanceWorldSpace(InstanceTransform);
 

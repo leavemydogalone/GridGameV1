@@ -31,4 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FVector2D GetHexUnitVector(EHexDirection Dir);
+
+	//UFUNCTION(BlueprintCallable, Category = "Grid")
+	//static FVector2D GetDirectionFromGameplayTag(FGameplayTag& GameplayTag);
 };

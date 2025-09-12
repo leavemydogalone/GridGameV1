@@ -17,8 +17,12 @@ struct FGridV1InputAction
 
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag InputTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly)
+	FVector2D Direction = FVector2D();
 };
 
+class UInputAction;
 /**
  * 
  */
@@ -31,7 +35,11 @@ public:
 
 	const UInputAction* FindAbilityInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = false) const;
 
+	//const FGameplayTag& FindGameplayTagFromActionInput(const UInputAction* InputAction, bool bLogNotFound) const;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FGridV1InputAction> AbilityInputActions;
+
+
 	
 };

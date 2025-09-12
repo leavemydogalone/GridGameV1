@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Grid/Data/GridTypes.h"
 #include "GridPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UGridV1InputConfig;
+
 
 /**
  * 
@@ -44,5 +46,16 @@ private:
 	TObjectPtr<UGridV1InputConfig> InputConfig;
 
 	void Move(const FInputActionValue& InputActionValue);
+
+	void HandleMoveInput(EHexDirection HexDirection);
+
+
+	void MoveRight();
+	void MoveLeft();
+	void MoveUpRight();
+	void MoveUpLeft();
+	void MoveDownRight();
+	void MoveDownLeft();
+
 
 };

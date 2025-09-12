@@ -35,8 +35,12 @@ private:
 
 	FVector GridBottomLeftCornerLocation;
 
+	//This is so we can see the updated tile size in the editor preview. Will be overriden in play
 	UPROPERTY(EditAnywhere, Category = "Grid")
-	FVector GridTileSize = FVector(100.f, 100.f, 0.f);
+	FVector TileScale = FVector(1.f, 1.f, 1.f);
+
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	FVector GridTileSize = FVector(100.f, 100.f, 100.f);
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	FVector2D GridTileCount = FVector2D(10, 10);
