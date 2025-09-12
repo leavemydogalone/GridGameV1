@@ -27,6 +27,9 @@ public:
     float BaseSpeed = 600.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float MaxMomentum = 3.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     float HexSnapRadius = 50.f;
 
     void HandleDirectionalInput(EHexDirection NewDirection);
@@ -40,7 +43,7 @@ protected:
     EHexDirection BufferedInput;
 
     // Helpers
-    bool IsAtHexCenter() const;
+    //bool IsAtHexCenter() const;
     void ApplyBufferedInput();
 
     UFUNCTION(Server, Reliable)

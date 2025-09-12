@@ -13,6 +13,11 @@ AGrid::AGrid()
 	GridMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridMesh"));
 	GridMesh->SetupAttachment(GetRootComponent());
 
+	GridCenterCylinders = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridCenterCylinders"));
+	GridCenterCylinders->SetupAttachment(GetRootComponent());
+
+
+
 }
 
 //Called when an instance of this class is placed (in editor) or spawned
@@ -51,6 +56,7 @@ void AGrid::SetGridMeshInfo()
 	TileScale = GridTileSize / FoundGridInfo.MeshSize;
 
 	GridMesh->SetStaticMesh(FoundGridInfo.FlatMesh);
+	GridCenterCylinders->SetStaticMesh(CylinderMesh);
 
 	/*UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(FoundGridInfo.FlatBorderMaterial, this);*/
 
@@ -59,7 +65,6 @@ void AGrid::SetGridMeshInfo()
 
 	//GridMesh->SetMaterial(0, DynamicMaterial);
 	GridMesh->SetMaterial(0, FoundGridInfo.FlatBorderMaterial);
-
 
 	GridMesh->SetWorldScale3D(GridTileSize / FoundGridInfo.MeshSize);
 
@@ -115,6 +120,7 @@ void AGrid::SetGridCenterAndBottomLeft()
 void AGrid::SpawnGrid()
 {
 	GridMesh->ClearInstances();
+	GridCenterCylinders->ClearInstances();
 
 	GridTileCount.X = FMath::RoundToInt(GridTileCount.X);
 	GridTileCount.Y = FMath::RoundToInt(GridTileCount.Y);
@@ -150,8 +156,14 @@ void AGrid::SpawnHexagonalGrid()
 			);
 
 			const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, InstanceLocation, TileScale);
-
 			GridMesh->AddInstanceWorldSpace(InstanceTransform);
+
+			FVector CylinderScale = FVector(CenterRadius / 50.f, CenterRadius / 50.f, CenterHeight / 100.f);
+			FVector CylinderLocation = InstanceLocation;
+			CylinderLocation.Z += CenterHeight / 2.f; 
+			FTransform CylinderTransform(FRotator::ZeroRotator, CylinderLocation, CylinderScale);
+
+			GridCenterCylinders->AddInstanceWorldSpace(CylinderTransform);
 
 			j++;
 

@@ -1,8 +1,8 @@
 // Copyright Leavemydogalone
 
+#include "Input/GridV1InputConfig.h"
 #include "GameplayTagContainer.h"
 #include "EnhancedInputSubsystems.h"
-#include "Input/GridV1InputConfig.h"
 
 const UInputAction* UGridV1InputConfig::FindAbilityInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound) const
 {

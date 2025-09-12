@@ -10,6 +10,7 @@
 #include "GridV1/GridV1.h"
 #include "GridV1GameplayTags.h"
 #include "Engine/World.h"
+#include "DeveloperSettings/GridV1DeveloperSettings.h"
 #include "NativeGameplayTags.h"
 
 UGridShapeInfo* UGridFunctionLibrary::GetGridInfo(const UObject* WorldContextObject)
@@ -86,6 +87,20 @@ FVector2D UGridFunctionLibrary::GetHexUnitVector(EHexDirection Dir)
 	case EHexDirection::DownLeft:	return FVector2D(-0.5f, -FMath::Sqrt(3.f) / 2.f);
 	default:						return FVector2D::ZeroVector;
 	}
+}
+
+bool UGridFunctionLibrary::IsAtHexCenter(const AActor* Actor)
+{
+	const UGridV1DeveloperSettings* GridSettings = GetDefault<UGridV1DeveloperSettings>();
+
+	FVector Pos = Actor->GetActorLocation();
+	FVector Snapped = FVector(
+		FMath::GridSnap(Pos.X, GridSettings->GridTileSize.X),
+		FMath::GridSnap(Pos.Y, GridSettings->GridTileSize.Y),
+		Pos.Z
+	);
+
+	return FVector::Dist2D(Pos, Snapped) < GridSettings->GridCenterRadius;
 }
 
 //FVector2D UGridFunctionLibrary::GetDirectionFromGameplayTag(FGameplayTag& GameplayTag)

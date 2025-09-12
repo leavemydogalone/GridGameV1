@@ -29,10 +29,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMaterialInterface> GridMaterial;
 
-
-	//UPROPERTY(EditAnywhere, Category = "Grid")
 	FVector GridCenter = FVector::ZeroVector;
-
 	FVector GridBottomLeftCornerLocation;
 
 	//This is so we can see the updated tile size in the editor preview. Will be overriden in play
@@ -50,6 +47,19 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	bool UseEnvironment = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid")
+	TObjectPtr<UStaticMesh> CylinderMesh;
+
+	UPROPERTY(VisibleAnywhere, Category = "Grid")
+	TObjectPtr<UInstancedStaticMeshComponent> GridCenterCylinders;
+
+	// Adjustable radius for overlap cylinders
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	float CenterRadius = 50.f;
+
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	float CenterHeight = 100.f;
 
 	UFUNCTION()
 	void SpawnGrid();

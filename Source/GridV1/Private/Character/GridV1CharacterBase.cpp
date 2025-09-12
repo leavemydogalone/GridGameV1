@@ -37,18 +37,19 @@ void AGridV1CharacterBase::Tick(float DeltaTime)
 	AddMovementInput(Dir3D, 1.f);
 
 	// Check hex center
-	if (IsAtHexCenter())
+	if (UGridFunctionLibrary::IsAtHexCenter(this))
 	{
 		ApplyBufferedInput();
 	}
-
 }
 void AGridV1CharacterBase::HandleDirectionalInput(EHexDirection NewDirection)
 {
+	//I need this to take in the controller direction and handle directions based on that
+
 	if (NewDirection == EHexDirection::None)
 		return;
 
-	if (IsAtHexCenter())
+	if (UGridFunctionLibrary::IsAtHexCenter(this))
 	{
 		ServerSetDirection(NewDirection);
 	}
@@ -66,17 +67,17 @@ void AGridV1CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(AGridV1CharacterBase, Momentum);
 }
 
-bool AGridV1CharacterBase::IsAtHexCenter() const
-{
-	FVector Pos = GetActorLocation();
-	FVector Snapped = FVector(
-		FMath::GridSnap(Pos.X, 100.f),
-		FMath::GridSnap(Pos.Y, 100.f),
-		Pos.Z
-	);
-
-	return FVector::Dist2D(Pos, Snapped) < HexSnapRadius;
-}
+//bool AGridV1CharacterBase::IsAtHexCenter() const
+//{
+//	FVector Pos = GetActorLocation();
+//	FVector Snapped = FVector(
+//		FMath::GridSnap(Pos.X, 100.f),
+//		FMath::GridSnap(Pos.Y, 100.f),
+//		Pos.Z
+//	);
+//
+//	return FVector::Dist2D(Pos, Snapped) < HexSnapRadius;
+//}
 
 void AGridV1CharacterBase::ApplyBufferedInput()
 {
@@ -89,19 +90,19 @@ void AGridV1CharacterBase::ApplyBufferedInput()
 
 void AGridV1CharacterBase::ServerSetDirection_Implementation(EHexDirection NewDirection)
 {
-	// Calculate angle change
 	FVector2D OldVec = UGridFunctionLibrary::GetHexUnitVector(CurrentDirection);
 	FVector2D NewVec = UGridFunctionLibrary::GetHexUnitVector(NewDirection);
 
 	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector2D::DotProduct(OldVec, NewVec)));
 
-	/*if (CurrentDirection == EHexDirection::None)
+	if (CurrentDirection == EHexDirection::None)
 	{
 		Momentum = 1.f;
 	}
 	else if (Angle <= 60.f)
 	{
-		Momentum += 0.5f;
+		//Updated this
+		Momentum = FMath::Max(MaxMomentum, Momentum + 0.5f);
 	}
 	else if (Angle <= 120.f)
 	{
@@ -110,7 +111,7 @@ void AGridV1CharacterBase::ServerSetDirection_Implementation(EHexDirection NewDi
 	else
 	{
 		Momentum = 1.f;
-	}*/
+	}
 
 	CurrentDirection = NewDirection;
 	OnRep_MovementState();

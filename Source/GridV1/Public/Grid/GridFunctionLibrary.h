@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FVector2D GetHexUnitVector(EHexDirection Dir);
 
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static bool IsAtHexCenter(const AActor* Actor);
+
 	//UFUNCTION(BlueprintCallable, Category = "Grid")
 	//static FVector2D GetDirectionFromGameplayTag(FGameplayTag& GameplayTag);
 };
