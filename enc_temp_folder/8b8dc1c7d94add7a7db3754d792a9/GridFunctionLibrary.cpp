@@ -39,11 +39,9 @@ FVector UGridFunctionLibrary::SnapVectorToGrid(FVector InVector)
 {
 	const UGridV1DeveloperSettings* GridSettings = GetDefault<UGridV1DeveloperSettings>();
 
-	FVector UpdatedTileSize = GridSettings->GridTileSize * FVector(1.5f, 1.f, 1.f);
-
 	return FVector(
-		FMath::GridSnap(InVector.X, UpdatedTileSize.X),
-		FMath::GridSnap(InVector.Y, UpdatedTileSize.Y),
+		FMath::GridSnap(InVector.X, GridSettings->GridTileSize.X),
+		FMath::GridSnap(InVector.Y, GridSettings->GridTileSize.Y),
 		InVector.Z
 	);
 }
@@ -184,8 +182,6 @@ FVector UGridFunctionLibrary::GetNextHexCenterInDirection(FVector StartLocation,
 	default:						
 		break;
 	}
-
-	//Snap to grid?
 	return InstanceLocation;
 
 }

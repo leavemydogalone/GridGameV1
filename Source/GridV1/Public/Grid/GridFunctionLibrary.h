@@ -24,6 +24,9 @@ public:
 	static FVector SnapVectorToVector(FVector V1, FVector V2);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static FVector SnapVectorToGrid(FVector InVector);
+
+	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static bool IsFloatEven(float InFloat);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
@@ -34,6 +37,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static bool IsAtHexCenter(const AActor* Actor);
+
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static FVector GetNextHexCenterInDirection(FVector StartLocation, const EHexDirection Direction);
+
+	//Function to convert direction based on controller rotation
 
 	//UFUNCTION(BlueprintCallable, Category = "Grid")
 	//static FVector2D GetDirectionFromGameplayTag(FGameplayTag& GameplayTag);

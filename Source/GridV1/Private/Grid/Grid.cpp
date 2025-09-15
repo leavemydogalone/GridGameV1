@@ -143,15 +143,15 @@ void AGrid::SpawnHexagonalGrid()
 
 		for (int32 j = FirstIndexOfRow; j < DoubledRowIndex; j++)
 		{
-			float XOffset = static_cast<float>(i);
-			float YOffset = static_cast<float>(j);
+			float VerticalOffset = static_cast<float>(i);
+			float HorizontalOffset = static_cast<float>(j);
 
-			XOffset = i * 0.75f;
-			YOffset = j * 0.5f;
+			VerticalOffset = i * 0.75f;
+			HorizontalOffset = j * 0.5f;
 
 			const FVector InstanceLocation = FVector(
-				GridBottomLeftCornerLocation.X + (XOffset * GridTileSize.X) + (GridTileSize.X / 2),
-				GridBottomLeftCornerLocation.Y + (YOffset * GridTileSize.Y) + (GridTileSize.Y / 2),
+				GridBottomLeftCornerLocation.X + (VerticalOffset * GridTileSize.X) + (GridTileSize.X / 2),
+				GridBottomLeftCornerLocation.Y + (HorizontalOffset * GridTileSize.Y) + (GridTileSize.Y / 2),
 				GridBottomLeftCornerLocation.Z
 			);
 

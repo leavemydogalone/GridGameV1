@@ -32,7 +32,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     float HexSnapRadius = 50.f;
 
-    void HandleDirectionalInput(EHexDirection NewDirection);
+    void HandleDirectionalInput(FRotator ControllerRotation, EHexDirection NewDirection);
 
 protected:
 	virtual void BeginPlay() override;
@@ -51,4 +51,11 @@ protected:
 
     UFUNCTION()
     void OnRep_MovementState();
+
+    FRotator CharacterNorthRotation;
+    bool CharacterNorthRotatorSet = false;
+
+private:
+    
+
 };

@@ -91,15 +91,17 @@ void AGridPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AGridPlayerController::HandleMoveInput(EHexDirection HexDirection)
 {
-	//FVector2D Axis = InputActionValue.Get<FVector2D>();
-
 	AGridV1CharacterBase* Char = Cast<AGridV1CharacterBase>(GetPawn());
 	if (!Char) return;
 
-	//FGameplayTag DirectionTag = InputConfig->FindGameplayTagFromActionInput(InputActionValue);
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
+	//const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	//const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	Char->HandleDirectionalInput(HexDirection);
+	// We will also want to pass the player controller direction
+	Char->HandleDirectionalInput(YawRotation, HexDirection);
 
 }
 
