@@ -15,9 +15,6 @@ AGrid::AGrid()
 
 	GridCenterCylinders = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridCenterCylinders"));
 	GridCenterCylinders->SetupAttachment(GetRootComponent());
-
-
-
 }
 
 //Called when an instance of this class is placed (in editor) or spawned
@@ -56,17 +53,10 @@ void AGrid::SetGridMeshInfo()
 	TileScale = GridTileSize / FoundGridInfo.MeshSize;
 
 	GridMesh->SetStaticMesh(FoundGridInfo.FlatMesh);
-	GridCenterCylinders->SetStaticMesh(CylinderMesh);
-
-	/*UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(FoundGridInfo.FlatBorderMaterial, this);*/
-
-	//float ScaleFactorX = GridTileSize.X / FoundGridInfo.MeshSize.X;
-	//DynamicMaterial->SetScalarParameterValue(TEXT("TextureScale"), ScaleFactorX);
-
-	//GridMesh->SetMaterial(0, DynamicMaterial);
 	GridMesh->SetMaterial(0, FoundGridInfo.FlatBorderMaterial);
-
 	GridMesh->SetWorldScale3D(GridTileSize / FoundGridInfo.MeshSize);
+
+	GridCenterCylinders->SetStaticMesh(CylinderMesh);
 
 }
 
@@ -77,37 +67,28 @@ void AGrid::SetGridCenterAndBottomLeft()
 	switch (GridShape)
 	{
 
-	case EGridShape::Square:
-
-		FVector2D EvenTileCount = GridTileCount;
-		if (UGridFunctionLibrary::IsFloatEven(GridTileCount.X) == false)
-		{
-			EvenTileCount.X -= 1;
-		}
-		if (UGridFunctionLibrary::IsFloatEven(GridTileCount.Y) == false)
-		{
-			EvenTileCount.Y -= 1;
-		}
-
-		CenterSnappedToGrid = UGridFunctionLibrary::SnapVectorToVector(GridCenter, GridTileSize);
-
-		CenterSnappedToGrid.Z = GetActorLocation().Z;
-
-		GridBottomLeftCornerLocation = CenterSnappedToGrid - FVector(GridTileSize.X * (EvenTileCount.X / 2), GridTileSize.Y * (EvenTileCount.Y / 2), 0.f);
-
-		break;
-
-
 	case EGridShape::Hexagon:
 		
-		FVector UpdatedTileSize = GridTileSize * FVector(1.5f, 1.f, 1.f);
-		CenterSnappedToGrid = UGridFunctionLibrary::SnapVectorToVector(GridCenter, UpdatedTileSize);
+		//V2
+
+		CenterSnappedToGrid = UGridFunctionLibrary::SnapVectorToHexCenter(GridCenter);
 
 		CenterSnappedToGrid.Z = GetActorLocation().Z;
 
-		FVector BottomLeftCornerDistanceFromCenter = FVector(UpdatedTileSize.X * (GridTileCount.X / 3), UpdatedTileSize.Y * (GridTileCount.Y / 2), 0.f);
+		/*FVector BottomLeftCornerDistanceFromCenter = FVector(GridTileSize.X * (GridTileCount.X / 3), UpdatedTileSize.Y * (GridTileCount.Y / 2), 0.f);*/
 
-		GridBottomLeftCornerLocation = CenterSnappedToGrid - UGridFunctionLibrary::SnapVectorToVector(BottomLeftCornerDistanceFromCenter, UpdatedTileSize);
+		GridBottomLeftCornerLocation = CenterSnappedToGrid;
+
+
+		/// V1
+		//FVector UpdatedTileSize = GridTileSize * FVector(1.5f, 1.f, 1.f);
+		//CenterSnappedToGrid = UGridFunctionLibrary::SnapVectorToVector(GridCenter, UpdatedTileSize);
+
+		//CenterSnappedToGrid.Z = GetActorLocation().Z;
+
+		//FVector BottomLeftCornerDistanceFromCenter = FVector(UpdatedTileSize.X * (GridTileCount.X / 3), UpdatedTileSize.Y * (GridTileCount.Y / 2), 0.f);
+
+		//GridBottomLeftCornerLocation = CenterSnappedToGrid - UGridFunctionLibrary::SnapVectorToVector(BottomLeftCornerDistanceFromCenter, UpdatedTileSize);
 
 		break;
 
@@ -125,12 +106,8 @@ void AGrid::SpawnGrid()
 	GridTileCount.X = FMath::RoundToInt(GridTileCount.X);
 	GridTileCount.Y = FMath::RoundToInt(GridTileCount.Y);
 
-	if (GridShape == EGridShape::Hexagon) {
-		SpawnHexagonalGrid();
-	}
-	else if (GridShape == EGridShape::Square) {
-		SpawnSquareGrid();
-	}
+	SpawnHexagonalGrid();
+
 }
 
 void AGrid::SpawnHexagonalGrid()
@@ -170,26 +147,4 @@ void AGrid::SpawnHexagonalGrid()
 		}
 	}
 }
-
-void AGrid::SpawnSquareGrid()
-{
-	for (int32 i = 0; i < GridTileCount.X; i++)
-	{
-		for (int32 j = 0; j < GridTileCount.Y; j++)
-		{
-			const FVector InstanceLocation = FVector(
-				GridBottomLeftCornerLocation.X + (i * GridTileSize.X) + (GridTileSize.X / 2),
-				GridBottomLeftCornerLocation.Y + (j * GridTileSize.Y) + (GridTileSize.Y / 2),
-				GridBottomLeftCornerLocation.Z
-			);
-
-			const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, InstanceLocation, FVector(1.f, 1.f, 1.f));
-
-			GridMesh->AddInstanceWorldSpace(InstanceTransform);
-
-		}
-	}
-}
-
-
 

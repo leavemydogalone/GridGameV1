@@ -52,16 +52,14 @@ void AGridV1CharacterBase::HandleDirectionalInput(FRotator ControllerRotation, E
 		CharacterNorthRotatorSet = true;
 	}
 
-	//insert function to convert direction based on controller rotation
-	
-	const FVector NextHex = UGridFunctionLibrary::GetNextHexCenterInDirection(UGridFunctionLibrary::SnapVectorToGrid(GetActorLocation()), NewDirection);
+	DrawDebugSphere(GetWorld(), UGridFunctionLibrary::SnapVectorToHexCenter(GetActorLocation()), 25.f, 12, FColor::Blue, false, 5.f);
 
-	//Draw debug sphere at next hex
+	const FVector NextHex = UGridFunctionLibrary::GetNextHexCenterInDirection(GetActorLocation(), NewDirection);
+
 	DrawDebugSphere(GetWorld(), NextHex, 25.f, 12, FColor::Red, false, 5.f);
 
 	if(CharacterNorthRotatorSet == true) return;
 
-	// End test
 
 
 

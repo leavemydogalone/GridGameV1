@@ -39,67 +39,28 @@ FVector UGridFunctionLibrary::SnapVectorToGrid(FVector InVector)
 {
 	const UGridV1DeveloperSettings* GridSettings = GetDefault<UGridV1DeveloperSettings>();
 
-	FVector UpdatedTileSize = GridSettings->GridTileSize * FVector(1.5f, 1.f, 1.f);
+	FVector UpdatedTileSize = GridSettings->GridTileSize;
 
 	return FVector(
-		FMath::GridSnap(InVector.X, UpdatedTileSize.X),
-		FMath::GridSnap(InVector.Y, UpdatedTileSize.Y),
+		UKismetMathLibrary::GridSnap_Float(InVector.X, UpdatedTileSize.X),
+		UKismetMathLibrary::GridSnap_Float(InVector.Y, UpdatedTileSize.Y),
 		InVector.Z
 	);
+}
+
+FVector UGridFunctionLibrary::SnapVectorToHexCenter(FVector WorldPos)
+{
+	const UGridV1DeveloperSettings* GridSettings = GetDefault<UGridV1DeveloperSettings>();
+	FVector2D HexSize(GridSettings->GridTileSize.X, GridSettings->GridTileSize.Y);
+
+	FCubeCoordF Fractional = WorldToHex(WorldPos, HexSize);
+	FCubeCoord Rounded = CubeRound(Fractional);
+	return HexToWorld(Rounded, HexSize, WorldPos.Z);
 }
 
 bool UGridFunctionLibrary::IsFloatEven(float InFloat)
 {
 	return FMath::IsNearlyZero(FMath::Fmod(InFloat, 2.0f));
-}
-
-FVector UGridFunctionLibrary::TraceForGround(FVector StartLocation, bool HitSomething, FVector GridTileSize, UObject* WorldContextObject)
-{
-	TArray<FHitResult> OutHits;
-	FVector OutVector = FVector::ZeroVector;
-
-	if (!WorldContextObject) return OutVector;
-
-	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
-
-	if (WorldContextObject)
-	{
-		float ApproximateSizeOfTile = GridTileSize.X / 3;
-
-		bool bHit = World->SweepMultiByChannel(
-			/*OutHits=*/ OutHits,
-			/*Start=*/ StartLocation + FVector(0.f, 0.f, 1000.f),
-			/*End=*/ StartLocation - FVector(0.f, 0.f, 1000.f),
-			/*Quat=*/ FQuat::Identity,
-			/*TraceChannel=*/ ECC_Ground,
-			/*CollisionShape=*/ FCollisionShape::MakeSphere(ApproximateSizeOfTile)
-		);
-		if (bHit)
-		{
-			// Example: return the first hit location
-			OutVector = OutHits[0].ImpactPoint;
-			HitSomething = OutHits.Num() > 0;
-		}
-	}
-
-	//Note to self, in the video he uses the start locations x and y but uses the hit z
-	//He also snaps the z to the grid
-
-	return OutVector;
-}
-
-FVector2D UGridFunctionLibrary::GetHexUnitVector(EHexDirection Dir)
-{
-	switch (Dir)
-	{
-	case EHexDirection::Right:      return FVector2D(1, 0);
-	case EHexDirection::Left:		return FVector2D(-1, 0);
-	case EHexDirection::UpRight:	return FVector2D(0.5f, FMath::Sqrt(3.f) / 2.f);
-	case EHexDirection::UpLeft:		return FVector2D(-0.5f, FMath::Sqrt(3.f) / 2.f);
-	case EHexDirection::DownRight:	return FVector2D(0.5f, -FMath::Sqrt(3.f) / 2.f);
-	case EHexDirection::DownLeft:	return FVector2D(-0.5f, -FMath::Sqrt(3.f) / 2.f);
-	default:						return FVector2D::ZeroVector;
-	}
 }
 
 bool UGridFunctionLibrary::IsAtHexCenter(const AActor* Actor)
@@ -186,8 +147,52 @@ FVector UGridFunctionLibrary::GetNextHexCenterInDirection(FVector StartLocation,
 	}
 
 	//Snap to grid?
+	//return SnapVectorToHexCenter(InstanceLocation);
 	return InstanceLocation;
 
+}
+
+FCubeCoordF UGridFunctionLibrary::WorldToHex(FVector World, FVector2D HexSize)
+{
+	float q = (FMath::Sqrt(3.f) / 3.f * World.X - 1.f / 3.f * World.Y) / HexSize.X;
+	float r = (2.f / 3.f * World.Y) / HexSize.Y;
+	float s = -q - r;
+
+	return FCubeCoordF(q, r, s);
+}
+
+FCubeCoord UGridFunctionLibrary::CubeRound(FCubeCoordF HexF)
+{
+	int32 Q = FMath::RoundToInt(HexF.Q);
+	int32 R = FMath::RoundToInt(HexF.R);
+	int32 S = FMath::RoundToInt(HexF.S);
+
+	float QDiff = FMath::Abs(Q - HexF.Q);
+	float RDiff = FMath::Abs(R - HexF.R);
+	float SDiff = FMath::Abs(S - HexF.S);
+
+	if (QDiff > RDiff && QDiff > SDiff)
+	{
+		Q = -R - S;
+	}
+	else if (RDiff > SDiff)
+	{
+		R = -Q - S;
+	}
+	else
+	{
+		S = -Q - R;
+	}
+
+	return FCubeCoord(Q, R, S);
+}
+
+FVector UGridFunctionLibrary::HexToWorld(FCubeCoord Cube, FVector2D HexSize, float Z)
+{
+	float x = HexSize.X * (FMath::Sqrt(3.f) * Cube.Q + FMath::Sqrt(3.f) / 2.f * Cube.R);
+	float y = HexSize.Y * (3.f / 2.f * Cube.R);
+
+	return FVector(x, y, Z);
 }
 
 //FVector2D UGridFunctionLibrary::GetDirectionFromGameplayTag(FGameplayTag& GameplayTag)
@@ -218,3 +223,54 @@ FVector UGridFunctionLibrary::GetNextHexCenterInDirection(FVector StartLocation,
 //	}
 //	return FVector2D::ZeroVector;
 //}
+
+
+FVector2D UGridFunctionLibrary::GetHexUnitVector(EHexDirection Dir)
+{
+	switch (Dir)
+	{
+	case EHexDirection::Right:      return FVector2D(1, 0);
+	case EHexDirection::Left:		return FVector2D(-1, 0);
+	case EHexDirection::UpRight:	return FVector2D(0.5f, FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::UpLeft:		return FVector2D(-0.5f, FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::DownRight:	return FVector2D(0.5f, -FMath::Sqrt(3.f) / 2.f);
+	case EHexDirection::DownLeft:	return FVector2D(-0.5f, -FMath::Sqrt(3.f) / 2.f);
+	default:						return FVector2D::ZeroVector;
+	}
+}
+
+
+FVector UGridFunctionLibrary::TraceForGround(FVector StartLocation, bool HitSomething, FVector GridTileSize, UObject* WorldContextObject)
+{
+	TArray<FHitResult> OutHits;
+	FVector OutVector = FVector::ZeroVector;
+
+	if (!WorldContextObject) return OutVector;
+
+	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
+
+	if (WorldContextObject)
+	{
+		float ApproximateSizeOfTile = GridTileSize.X / 3;
+
+		bool bHit = World->SweepMultiByChannel(
+			/*OutHits=*/ OutHits,
+			/*Start=*/ StartLocation + FVector(0.f, 0.f, 1000.f),
+			/*End=*/ StartLocation - FVector(0.f, 0.f, 1000.f),
+			/*Quat=*/ FQuat::Identity,
+			/*TraceChannel=*/ ECC_Ground,
+			/*CollisionShape=*/ FCollisionShape::MakeSphere(ApproximateSizeOfTile)
+		);
+		if (bHit)
+		{
+			// Example: return the first hit location
+			OutVector = OutHits[0].ImpactPoint;
+			HitSomething = OutHits.Num() > 0;
+		}
+	}
+
+	//Note to self, in the video he uses the start locations x and y but uses the hit z
+	//He also snaps the z to the grid
+
+	return OutVector;
+}
