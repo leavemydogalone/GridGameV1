@@ -23,14 +23,16 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Grid")
-	TObjectPtr<UInstancedStaticMeshComponent> GridMesh;
 
+	/* Hex Grid */
 	UPROPERTY()
-	TObjectPtr<UMaterialInterface> GridMaterial;
+	TObjectPtr<UInstancedStaticMeshComponent> GridHexagons;
 
-	FVector GridCenter = FVector::ZeroVector;
-	FVector GridBottomLeftCornerLocation;
+	UPROPERTY(EditDefaultsOnly, Category = "Grid")
+	TObjectPtr<UStaticMesh> HexagonMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid")
+	TObjectPtr<UMaterialInterface> HexagonMaterial;
 
 	//This is so we can see the updated tile size in the editor preview. Will be overriden in play
 	UPROPERTY(EditAnywhere, Category = "Grid")
@@ -41,17 +43,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	FVector2D GridTileCount = FVector2D(10, 10);
-
-	UPROPERTY(EditAnywhere, Category = "Grid")
-	EGridShape GridShape = EGridShape::Square;
-
-	UPROPERTY(EditAnywhere, Category = "Grid")
-	bool UseEnvironment = false;
-
+	
+	/* Cylinder */
 	UPROPERTY(EditDefaultsOnly, Category = "Grid")
 	TObjectPtr<UStaticMesh> CylinderMesh;
 
-	UPROPERTY(VisibleAnywhere, Category = "Grid")
+	UPROPERTY()
 	TObjectPtr<UInstancedStaticMeshComponent> GridCenterCylinders;
 
 	// Adjustable radius for overlap cylinders
@@ -68,11 +65,6 @@ private:
 
 	void SetGridMeshInfo();
 
-	void SetGridCenterAndBottomLeft();
-
 	void SpawnHexagonalGrid();
-
-	void SpawnSquareGrid();
-	
 
 };
