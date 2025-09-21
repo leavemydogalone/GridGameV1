@@ -13,18 +13,10 @@
 #include "DeveloperSettings/GridV1DeveloperSettings.h"
 #include "NativeGameplayTags.h"
 
-UGridShapeInfo* UGridFunctionLibrary::GetGridInfo(const UObject* WorldContextObject)
-{
-	const AGridV1GameModeBase* GridV1GameModeBase = Cast<AGridV1GameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (GridV1GameModeBase == nullptr) 
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UGridFunctionLibrary::GetGridInfo: GridV1GameModeBase is nullptr"));
-		return nullptr;
-	}
-	return GridV1GameModeBase->GridInfo;
-
-
-}
+const TArray<FHex> UGridFunctionLibrary::hex_directions = {
+	   FHex(1, 0, -1), FHex(1, -1, 0), FHex(0, -1, 1),
+	   FHex(-1, 0, 1), FHex(-1, 1, 0), FHex(0, 1, -1)
+};
 
 FVector UGridFunctionLibrary::SnapVectorToVector(FVector V1, FVector V2)
 {

@@ -4,6 +4,7 @@
 #include "Grid/Grid.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Grid/Data/GridShapeInfo.h"
+#include "DeveloperSettings/GridV1DeveloperSettings.h"
 #include "Grid/GridFunctionLibrary.h"
 
 AGrid::AGrid()
@@ -52,6 +53,8 @@ void AGrid::SpawnGrid()
 
 void AGrid::SpawnHexagonalGrid()
 {
+	const UGridV1DeveloperSettings* GridSettings = GetDefault<UGridV1DeveloperSettings>();
+
 	//for (int32 i = 0; i < GridTileCount.X; i++)
 	//{
 	//	int32 FirstIndexOfRow = i % 2;
