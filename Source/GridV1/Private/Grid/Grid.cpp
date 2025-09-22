@@ -12,14 +12,11 @@ AGrid::AGrid()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 	GridHexagons = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridMesh"));
-	GridHexagons->SetStaticMesh(HexagonMesh);
+	
 	GridHexagons->SetupAttachment(GetRootComponent());
-	GridHexagons->SetMaterial(0, HexagonMaterial);
-	GridHexagons->SetWorldScale3D(TileScale);
 
 	GridCenterCylinders = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridCenterCylinders"));
 	GridCenterCylinders->SetupAttachment(GetRootComponent());
-	GridCenterCylinders->SetStaticMesh(CylinderMesh);
 
 }
 
@@ -34,8 +31,14 @@ void AGrid::OnConstruction(const FTransform& Transform)
 void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
+	GridHexagons->SetStaticMesh(HexagonMesh);
+	GridHexagons->SetMaterial(0, HexagonMaterial);
+	GridHexagons->SetWorldScale3D(TileScale);
 
-	//SpawnGrid();
+	GridCenterCylinders->SetStaticMesh(CylinderMesh);
+
+
+	SpawnGrid();
 }
 
 
@@ -54,6 +57,32 @@ void AGrid::SpawnGrid()
 void AGrid::SpawnHexagonalGrid()
 {
 	const UGridV1DeveloperSettings* GridSettings = GetDefault<UGridV1DeveloperSettings>();
+
+	TSet<FHex> MapContainer;
+
+	UGridFunctionLibrary::CreateRectangularGrid(MapContainer, GridTileCount.X, GridTileCount.Y);
+
+	UGridFunctionLibrary::Layout Layout(
+		UGridFunctionLibrary::layout_flat,
+		FVector2D(GridTileSize.X, GridTileSize.Y),
+		FVector2D::ZeroVector
+	);
+
+
+	for (const FHex& Hex : MapContainer)
+	{
+		FVector2D WorldPos2D = UGridFunctionLibrary::hex_to_pixel(Layout, Hex);
+		FVector WorldPos(WorldPos2D.X, WorldPos2D.Y, 0.f);
+
+		// Example: spawn debug sphere
+		DrawDebugSphere(GetWorld(), WorldPos, 20.f, 12, FColor::Blue, true);
+
+		// Or: spawn an actor/ISM instance at WorldPos
+		const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, WorldPos, TileScale);
+		GridHexagons->AddInstanceWorldSpace(InstanceTransform);
+	}
+
+
 
 	//for (int32 i = 0; i < GridTileCount.X; i++)
 	//{

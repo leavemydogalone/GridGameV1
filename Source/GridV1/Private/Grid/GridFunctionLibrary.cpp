@@ -18,6 +18,14 @@ const TArray<FHex> UGridFunctionLibrary::hex_directions = {
 	   FHex(-1, 0, 1), FHex(-1, 1, 0), FHex(0, 1, -1)
 };
 
+const UGridFunctionLibrary::Orientation UGridFunctionLibrary::layout_flat
+= Orientation(sqrt(3.0), sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0,
+	sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0,
+	0.5);
+//= Orientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0),
+//	2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0,
+//	0.0);
+
 FVector UGridFunctionLibrary::SnapVectorToVector(FVector V1, FVector V2)
 {
 	float SnappedX = UKismetMathLibrary::GridSnap_Float(V1.X, V2.X);
