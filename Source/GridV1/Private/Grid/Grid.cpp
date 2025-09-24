@@ -5,6 +5,7 @@
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Grid/Data/GridShapeInfo.h"
 #include "DeveloperSettings/GridV1DeveloperSettings.h"
+#include "Components/TextRenderComponent.h"
 #include "Grid/GridFunctionLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogGrid);
@@ -98,7 +99,11 @@ void AGrid::SpawnHexagonalGrid()
 		{
 			FString CoordText = FString::Printf(TEXT("Q:%d R:%d S:%d"), Hex.q, Hex.r, Hex.s);
 
-			DrawDebugString(GetWorld(), WorldPos + FVector(0, 0, 250.f), CoordText, nullptr, FColor::Blue, 1000.f, true);
+			UTextRenderComponent* TextComp = NewObject<UTextRenderComponent>(this);
+			TextComp->SetText(FText::FromString(CoordText));
+			TextComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+			TextComp->RegisterComponent();
+			TextComp->SetWorldLocation(WorldPos + FVector(0, 0, 150));
 		}
 
 		// Or: spawn an actor/ISM instance at WorldPos

@@ -26,7 +26,7 @@ public:
 	void GetCurrentHexAtLocation_Implementation(FVector Location) override;
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
-	bool DebugVisuals = true;
+	bool DebugVisuals = false;
 
 protected:
 	// Called when the game starts or when spawned

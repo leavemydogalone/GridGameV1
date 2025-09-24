@@ -40,7 +40,9 @@ void AGridPlayerController::SetupInputComponent()
 
 	UGridV1EnhancedInputComponent* GridV1EnhancedInputComponent = CastChecked<UGridV1EnhancedInputComponent>(InputComponent);
 
-	for (const FGridV1InputAction& Action : InputConfig->AbilityInputActions)
+	GridV1EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGridPlayerController::Move);
+
+	/*for (const FGridV1InputAction& Action : InputConfig->AbilityInputActions)
 	{
 		if (Action.InputAction && Action.InputTag.IsValid())
 		{
@@ -69,7 +71,7 @@ void AGridPlayerController::SetupInputComponent()
 				GridV1EnhancedInputComponent->BindAction(Action.InputAction, ETriggerEvent::Triggered, this, &AGridPlayerController::MoveDownRight);
 			}
 		}
-	}
+	}*/
 
 }
 
@@ -96,6 +98,7 @@ void AGridPlayerController::HandleMoveInput(EHexDirection HexDirection)
 
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+
 
 	//const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	//const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
