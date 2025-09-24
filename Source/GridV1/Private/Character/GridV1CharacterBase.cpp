@@ -19,6 +19,9 @@ void AGridV1CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Get character current hex position on grid
+
+
 }
 void AGridV1CharacterBase::Tick(float DeltaTime)
 {

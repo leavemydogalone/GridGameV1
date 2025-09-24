@@ -5,10 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Grid/Data/GridShapeInfo.h"
+#include "Grid/GridFunctionLibrary.h"
+#include "Interaction/GridInterface.h"
 #include "Grid.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogGrid, Log, All);
+
 UCLASS()
-class GRIDV1_API AGrid : public AActor
+class GRIDV1_API AGrid : public AActor , public IGridInterface 
 {
 	GENERATED_BODY()
 	
@@ -17,6 +21,12 @@ public:
 	AGrid();
 	
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	void GetCurrentHexAtLocation_Implementation(FVector Location) override;
+
+	UPROPERTY(EditAnywhere, Category = "Grid")
+	bool DebugVisuals = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -67,4 +77,6 @@ private:
 
 	void SpawnHexagonalGrid();
 
+	TSet<FHex> MapContainer;
+	FLayout GridLayout;
 };

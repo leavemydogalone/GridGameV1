@@ -62,7 +62,6 @@ void AGrid::BeginPlay()
 
 void AGrid::SpawnGrid()
 {
-	MapContainer.Empty();
 	GridHexagons->ClearInstances();
 	GridCenterCylinders->ClearInstances();
 
@@ -98,7 +97,7 @@ void AGrid::SpawnHexagonalGrid()
 		{
 			FString CoordText = FString::Printf(TEXT("Q:%d R:%d S:%d"), Hex.q, Hex.r, Hex.s);
 
-			DrawDebugString(GetWorld(), WorldPos + FVector(0, 0, 250.f), CoordText, nullptr, FColor::Blue, 1000.f, true);
+			DrawDebugString(GetWorld(), WorldPos + FVector(0, 0, 150.f), CoordText, nullptr, FColor::Blue, 1000.f, true);
 		}
 
 		// Or: spawn an actor/ISM instance at WorldPos

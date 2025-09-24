@@ -49,6 +49,46 @@ FORCEINLINE uint32 GetTypeHash(const FHex& Hex)
 	return HashCombine(HashQ, HashR);
 }
 
+USTRUCT()
+struct FOrientation {
+	GENERATED_BODY();
+
+	double f0, f1, f2, f3;
+	double b0, b1, b2, b3;
+	double start_angle; // in multiples of 60°
+	FOrientation(double f0_, double f1_, double f2_, double f3_,
+		double b0_, double b1_, double b2_, double b3_,
+		double start_angle_)
+		: f0(f0_), f1(f1_), f2(f2_), f3(f3_),
+		b0(b0_), b1(b1_), b2(b2_), b3(b3_),
+		start_angle(start_angle_) {
+	}
+
+	FOrientation()
+		: f0(0), f1(0), f2(0), f3(0),
+		b0(0), b1(0), b2(0), b3(0),
+		start_angle(0) {
+	}
+};
+
+USTRUCT()
+struct FLayout {
+	GENERATED_BODY();
+
+	FOrientation orientation;
+	FVector2D size;
+	FVector2D origin;
+	FLayout(FOrientation orientation_, FVector2D size_, FVector2D origin_)
+		: orientation(orientation_), size(size_), origin(origin_) {
+	}
+
+	FLayout()
+		: orientation(FOrientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0),
+			2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0,
+			0.0)), size(FVector2D(1, 1)), origin(FVector2D::ZeroVector) {
+	}
+};
+
 /**
  * 
  */
@@ -58,8 +98,6 @@ class GRIDV1_API UGridFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
-
-
 
 	/* Grid Math */
 	
@@ -94,40 +132,10 @@ public:
 		return hex_add(hex, hex_direction(direction));
 	}
 
-	struct Orientation {
-		const double f0, f1, f2, f3;
-		const double b0, b1, b2, b3;
-		const double start_angle; // in multiples of 60°
-		Orientation(double f0_, double f1_, double f2_, double f3_,
-			double b0_, double b1_, double b2_, double b3_,
-			double start_angle_)
-			: f0(f0_), f1(f1_), f2(f2_), f3(f3_),
-			b0(b0_), b1(b1_), b2(b2_), b3(b3_),
-			start_angle(start_angle_) {
-		}
-	};
+	static const FOrientation layout_flat;
 
-	//static const Orientation layout_pointy
-	//	= Orientation(sqrt(3.0), sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0,
-	//		sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0,
-	//		0.5);
-
-	static const Orientation layout_flat;
-		//= Orientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0),
-		//	2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0,
-		//	0.0);
-
-	struct Layout {
-		const Orientation orientation;
-		const FVector2D size;
-		const FVector2D origin;
-		Layout(Orientation orientation_, FVector2D size_, FVector2D origin_)
-			: orientation(orientation_), size(size_), origin(origin_) {
-		}
-	};
-
-	static FVector2D hex_to_pixel(Layout layout, FHex h) {
-		const Orientation& M = layout.orientation;
+	static FVector2D hex_to_pixel(FLayout layout, FHex h) {
+		const FOrientation& M = layout.orientation;
 		double x = (M.f0 * h.q + M.f1 * h.r) * layout.size.X;
 		double y = (M.f2 * h.q + M.f3 * h.r) * layout.size.Y;
 		return FVector2D(x + layout.origin.X, y + layout.origin.Y);
@@ -140,8 +148,8 @@ public:
 		}
 	};
 
-	static FractionalHex pixel_to_hex_fractional(Layout layout, FVector2D p) {
-		const Orientation& M = layout.orientation;
+	static FractionalHex pixel_to_hex_fractional(FLayout layout, FVector2D p) {
+		const FOrientation& M = layout.orientation;
 		FVector2D pt = FVector2D((p.X - layout.origin.X) / layout.size.X,
 			(p.Y - layout.origin.Y) / layout.size.Y);
 		double q = M.b0 * pt.X + M.b1 * pt.Y;
@@ -180,7 +188,7 @@ public:
 			lerp(a.s, b.s, t));
 	}
 
-	static FHex pixel_to_hex_rounded(Layout layout, FVector2D p) {
+	static FHex pixel_to_hex_rounded(FLayout layout, FVector2D p) {
 		return hex_round(pixel_to_hex_fractional(layout, p));
 	}
 
@@ -199,8 +207,8 @@ public:
 	
 	static void CreateRectangularGrid(TSet<FHex>& MapContainer, int32 Width, int32 Height)
 	{
-		int32 left = 0;
-		int32 top = 0;
+		int32 left = -Width;
+		int32 top = -Height;
 		int32 right = Width;
 		int32 bottom = Height;
 
@@ -211,6 +219,9 @@ public:
 			}
 		}
 	}
+
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	static AActor* GetGridManager(UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FVector SnapVectorToVector(FVector V1, FVector V2);
