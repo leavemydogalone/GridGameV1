@@ -15,24 +15,37 @@
 #include "NativeGameplayTags.h"
 
 const TArray<FHex> UGridFunctionLibrary::hex_directions = {
-	   FHex(1, 0, -1), FHex(1, -1, 0), FHex(0, -1, 1),
-	   FHex(-1, 0, 1), FHex(-1, 1, 0), FHex(0, 1, -1)
+	   FHex(1, 0, -1), //North
+       FHex(0, 1, -1), //NorthEast
+       FHex(-1, 1, 0), //SouthEast
+	   FHex(-1, 0, 1), //South
+       FHex(0, -1, 1), //SouthWest
+       FHex(1, -1, 0), //NorthWest
 };
 
+//const TArray<FHex> UGridFunctionLibrary::hex_directions = {
+//       FHex(1, 0, -1), //SouthEast
+//       FHex(1, -1, 0), //SouthEast
+//       FHex(0, -1, 1), //South
+//       FHex(-1, 0, 1), //SouthWest
+//       FHex(-1, 1, 0), //NorthWest
+//       FHex(0, 1, -1) //North
+//};
+
 const FOrientation UGridFunctionLibrary::layout_flat
-//= FOrientation(sqrt(3.0), sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0,
-//	sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0,
-//	0.5);
+= FOrientation(sqrt(3.0), sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0,
+	sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0,
+	0.5);
 //= FOrientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0),
 //	2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0,
 //	0.0);
-= FOrientation(
-    sqrt(3.0) / 2.0, sqrt(3.0),
-    3.0 / 2.0, 0.0,
-    -1.0 / 3.0, sqrt(3.0) / 3.0,
-    0.0, 2.0 / 3.0,
-    0.0 // no offset
-);
+//= FOrientation(
+//    sqrt(3.0) / 2.0, sqrt(3.0),
+//    3.0 / 2.0, 0.0,
+//    -1.0 / 3.0, sqrt(3.0) / 3.0,
+//    0.0, 2.0 / 3.0,
+//    0.0 // no offset
+//);
 
 AActor* UGridFunctionLibrary::GetGridManager(UObject* WorldContextObject)
 {

@@ -27,8 +27,7 @@ public:
 	void GetCurrentHexAtLocation_Implementation(FVector Location) override;
 
 
-	//UFUNCTION(BlueprintCallable, Category = "Grid")
-	//FVector GetLocationOfNextHexInDirection_Implementation(FVector StartLocation, FHex Hex) override;
+	FVector2D GetNextHexCenter_Implementation(FVector StartLocation, int32 Direction) override;
 
 	/* End Grid Interface */
 

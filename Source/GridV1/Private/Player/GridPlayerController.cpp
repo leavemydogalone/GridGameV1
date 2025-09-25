@@ -8,6 +8,7 @@
 #include "Input/GridV1InputConfig.h"
 #include "Grid/Data/GridTypes.h"
 #include "GridV1GameplayTags.h"
+#include "Interaction/GridInterface.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Input/GridV1EnhancedInputComponent.h"
 
@@ -42,38 +43,7 @@ void AGridPlayerController::SetupInputComponent()
 
 	UGridV1EnhancedInputComponent* GridV1EnhancedInputComponent = CastChecked<UGridV1EnhancedInputComponent>(InputComponent);
 
-	GridV1EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGridPlayerController::Move);
-
-	/*for (const FGridV1InputAction& Action : InputConfig->AbilityInputActions)
-	{
-		if (Action.InputAction && Action.InputTag.IsValid())
-		{
-			if (Action.InputTag == NativeGameplayTags::DirectionTags::TAG_Direction_Left)
-			{
-				GridV1EnhancedInputComponent->BindAction(Action.InputAction, ETriggerEvent::Triggered, this, &AGridPlayerController::MoveLeft);
-			}
-			else if (Action.InputTag == NativeGameplayTags::DirectionTags::TAG_Direction_Right)
-			{
-				GridV1EnhancedInputComponent->BindAction(Action.InputAction, ETriggerEvent::Triggered, this, &AGridPlayerController::MoveRight);
-			}
-			else if (Action.InputTag == NativeGameplayTags::DirectionTags::TAG_Direction_UpLeft)
-			{
-				GridV1EnhancedInputComponent->BindAction(Action.InputAction, ETriggerEvent::Triggered, this, &AGridPlayerController::MoveUpLeft);
-			}
-			else if (Action.InputTag == NativeGameplayTags::DirectionTags::TAG_Direction_UpRight)
-			{
-				GridV1EnhancedInputComponent->BindAction(Action.InputAction, ETriggerEvent::Triggered, this, &AGridPlayerController::MoveUpRight);
-			}
-			else if (Action.InputTag == NativeGameplayTags::DirectionTags::TAG_Direction_DownLeft)
-			{
-				GridV1EnhancedInputComponent->BindAction(Action.InputAction, ETriggerEvent::Triggered, this, &AGridPlayerController::MoveDownLeft);
-			}
-			else if (Action.InputTag == NativeGameplayTags::DirectionTags::TAG_Direction_DownRight)
-			{
-				GridV1EnhancedInputComponent->BindAction(Action.InputAction, ETriggerEvent::Triggered, this, &AGridPlayerController::MoveDownRight);
-			}
-		}
-	}*/
+	GridV1EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGridPlayerController::HandleMoveInput);
 
 }
 
@@ -91,6 +61,7 @@ void AGridPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
+
 }
 
 void AGridPlayerController::HandleMoveInput(const FInputActionValue& InputActionValue)
@@ -160,16 +131,77 @@ EHexMoveType AGridPlayerController::ResolveHexInput(FVector2D Input)
 	if (X > 0 && Y == 0) return EHexMoveType::RotateRight;
 
 	return EHexMoveType::None;
+
+
 }
 
-void AGridPlayerController::ExecuteMove(EHexMoveType)
+void AGridPlayerController::ExecuteMove(EHexMoveType MoveType)
 {
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		FRotator Rotation = GetControlRotation();
+
+		const IGridInterface* GridManager = Cast<IGridInterface>(UGridFunctionLibrary::GetGridManager(ControlledPawn));
+
+		int32 Direction = FMath::FloorToInt(Rotation.Yaw / 60.f);
+
+		//FHex HexDirection = UGridFunctionLibrary::hex_directions[RotationToMovementDirection];
+		
+		switch (MoveType)
+		{
+		case EHexMoveType::RotateLeft:
+			//Handle player rotation here
+			return;
+			break;
+
+		case EHexMoveType::RotateRight:
+			//Handle player rotation here
+			return;
+
+			break;
+		case EHexMoveType::Forward:
+			Direction += 0;
+			break;
+		case EHexMoveType::ForwardRight:
+			Direction += 1;
+			break;
+		case EHexMoveType::BackwardRight:
+			Direction += 2;
+			break;
+		case EHexMoveType::Backward:
+			Direction += 3;
+			break;
+		case EHexMoveType::BackwardLeft:
+			Direction += 4;
+			break;
+		case EHexMoveType::ForwardLeft:
+			Direction += 5;
+			break;
+		default:
+			break;
+		}
+
+		if (Direction >= 6) Direction -= 6;
+
+		const FVector2D TargetLocation = IGridInterface::Execute_GetNextHexCenter(UGridFunctionLibrary::GetGridManager(ControlledPawn), ControlledPawn->GetActorLocation(), Direction);
+
+		FVector ThreeDTarget = FVector(TargetLocation.X, TargetLocation.Y, ControlledPawn->GetActorLocation().Z);
+
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ThreeDTarget);
+
+	}
+
+
+	// Get the rotation of the character
+	// Get the desired movement cardinal direction based on character rotation and input
+	// ex) if character is facing 0 degrees and input is forward right, direction is FHex(1, -1, 0)
+	// 
 	// Get the hex in direction
 
 	// Get current hex to then get the hex in provided direction
 
 
-	//UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+	
 
 
 }

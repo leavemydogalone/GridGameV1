@@ -21,12 +21,12 @@ class GRIDV1_API IGridInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+	
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
 	void GetCurrentHexAtLocation(FVector Location);
 
-	/*UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
-	FVector GetLocationOfNextHexInDirection(FHex Hex);*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
+	FVector2D GetNextHexCenter(FVector StartLocation, int32 Direction);
 };

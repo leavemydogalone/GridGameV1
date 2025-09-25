@@ -46,6 +46,14 @@ void AGrid::GetCurrentHexAtLocation_Implementation(FVector Location)
 	UE_LOG(LogGrid, Log, TEXT("Current Hex Position: %s"), *CoordText);
 }
 
+FVector2D AGrid::GetNextHexCenter_Implementation(FVector StartLocation, int32 Direction)
+{
+	FHex CurrentHex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(StartLocation.X, StartLocation.Y));
+	FHex Neighbor = UGridFunctionLibrary::hex_neighbor(CurrentHex, Direction);
+	FVector2D WorldPos2D = UGridFunctionLibrary::hex_to_pixel(GridLayout, Neighbor);
+	return FVector2D(WorldPos2D.X, WorldPos2D.Y);
+}
+
 //FVector AGrid::GetLocationOfNextHexInDirection_Implementation(FVector StartLocation, FHex Hex)
 //{
 //	return FVector();

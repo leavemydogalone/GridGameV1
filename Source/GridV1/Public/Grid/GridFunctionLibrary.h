@@ -9,37 +9,7 @@
 #include <vector>
 #include "GridFunctionLibrary.generated.h"
 
-USTRUCT(BlueprintType)
-struct FHex
-{
-	GENERATED_BODY();
 
-	int32 q;
-	int32 r;
-	int32 s;
-
-	FHex(int32 Inq, int32 Inr, int32 Ins)
-		: q(Inq), r(Inr), s(Ins)
-	{
-		check(q + r + s == 0);
-	}
-
-	FHex()
-		: q(0), r(0), s(0)
-	{
-	}
-
-	FORCEINLINE bool operator == (const FHex& Other) const
-	{
-		return q == Other.q && r == Other.r && s == Other.s;
-	}
-
-	FORCEINLINE bool operator != (const FHex& Other) const
-	{
-		return !(*this == Other);
-	}
-
-};
 
 FORCEINLINE uint32 GetTypeHash(const FHex& Hex)
 {

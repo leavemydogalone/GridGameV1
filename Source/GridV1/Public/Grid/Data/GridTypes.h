@@ -32,6 +32,58 @@ enum class EHexDirection : uint8
 	SouthWest	UMETA(DisplayName = "SouthWest"),
 };
 
+USTRUCT(BlueprintType)
+struct FHex
+{
+	GENERATED_BODY();
+
+	int32 q;
+	int32 r;
+	int32 s;
+
+	FHex(int32 Inq, int32 Inr, int32 Ins)
+		: q(Inq), r(Inr), s(Ins)
+	{
+		check(q + r + s == 0);
+	}
+
+	FHex()
+		: q(0), r(0), s(0)
+	{
+	}
+
+	FORCEINLINE bool operator == (const FHex& Other) const
+	{
+		return q == Other.q && r == Other.r && s == Other.s;
+	}
+
+	FORCEINLINE bool operator != (const FHex& Other) const
+	{
+		return !(*this == Other);
+	}
+
+};
+
+static const TMap<EHexDirection, FHex> DirectionToHex = {
+	{EHexDirection::North,     FHex(0, -1, 1)},
+	{EHexDirection::South,     FHex(0, 1, -1)},
+	{EHexDirection::NorthEast, FHex(1, -1, 0)},
+	{EHexDirection::NorthWest, FHex(-1, 0, 1)},
+	{EHexDirection::SouthEast, FHex(1, 0, -1)},
+	{EHexDirection::SouthWest, FHex(-1, 1, 0)}
+};
+
+static const TMap<EHexDirection, FRotator> DirectionToRotation = {
+	{EHexDirection::North,     FRotator(0.f,   0.f, 0.f)},
+	{EHexDirection::NorthEast, FRotator(0.f,  60.f, 0.f)},
+	{EHexDirection::SouthEast, FRotator(0.f, 120.f, 0.f)},
+	{EHexDirection::South,     FRotator(0.f, 180.f, 0.f)},
+	{EHexDirection::SouthWest, FRotator(0.f, 240.f, 0.f)},
+	{EHexDirection::NorthWest, FRotator(0.f, 300.f, 0.f)}
+};
+
+//rotation to hex direction
+
 
 
 USTRUCT(BlueprintType)
