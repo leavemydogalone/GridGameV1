@@ -23,94 +23,19 @@ const FOrientation UGridFunctionLibrary::layout_flat
 //= FOrientation(sqrt(3.0), sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0,
 //	sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0,
 //	0.5);
-= FOrientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0),
-	2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0,
-	0.0);
+//= FOrientation(3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0),
+//	2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0,
+//	0.0);
+= FOrientation(
+    sqrt(3.0) / 2.0, sqrt(3.0),
+    3.0 / 2.0, 0.0,
+    -1.0 / 3.0, sqrt(3.0) / 3.0,
+    0.0, 2.0 / 3.0,
+    0.0 // no offset
+);
 
 AActor* UGridFunctionLibrary::GetGridManager(UObject* WorldContextObject)
 {
 	return UGameplayStatics::GetActorOfClass(WorldContextObject, AGrid::StaticClass());
 }
 
-FVector UGridFunctionLibrary::SnapVectorToVector(FVector V1, FVector V2)
-{
-	float SnappedX = UKismetMathLibrary::GridSnap_Float(V1.X, V2.X);
-	float SnappedY = UKismetMathLibrary::GridSnap_Float(V1.Y, V2.Y);
-	float SnappedZ = UKismetMathLibrary::GridSnap_Float(V1.Z, V2.Z);
-
-	return FVector(SnappedX, SnappedY, SnappedZ);
-}
-
-
-FVector UGridFunctionLibrary::GetNextHexCenterInDirection(FVector StartLocation, const EHexDirection Direction)
-{
-	const UGridV1DeveloperSettings* GridSettings = GetDefault<UGridV1DeveloperSettings>();
-	FVector GridTileSize = GridSettings->GridTileSize;
-
-	float VerticalOffset =  0.75f;
-	float HorizontalOffset =  0.5f;
-
-	FVector InstanceLocation = FVector::ZeroVector;
-	float DiagonalVerticalDistance = VerticalOffset * GridTileSize.X;
-	float DiagonalHorizontalDistance = HorizontalOffset * GridTileSize.Y;
-
-
-	switch (Direction)
-	{
-	case EHexDirection::Right:   
-		InstanceLocation = FVector(
-			StartLocation.X,
-			StartLocation.Y + GridTileSize.Y,
-			StartLocation.Z
-		);
-		break;
-
-	case EHexDirection::Left:		
-		InstanceLocation = FVector(
-			StartLocation.X,
-			StartLocation.Y - GridTileSize.Y,
-			StartLocation.Z
-		);
-		break;
-
-	case EHexDirection::UpRight:	
-		InstanceLocation = FVector(
-			StartLocation.X + DiagonalVerticalDistance,
-			StartLocation.Y + DiagonalHorizontalDistance,
-			StartLocation.Z
-		);
-
-		break;
-
-	case EHexDirection::UpLeft:
-		InstanceLocation = FVector(
-			StartLocation.X + DiagonalVerticalDistance,
-			StartLocation.Y - DiagonalHorizontalDistance,
-			StartLocation.Z
-		);
-
-		break;
-
-	case EHexDirection::DownRight:
-		InstanceLocation = FVector(
-			StartLocation.X - DiagonalVerticalDistance,
-			StartLocation.Y + DiagonalHorizontalDistance,
-			StartLocation.Z
-		);
-		break;
-
-	case EHexDirection::DownLeft:
-		InstanceLocation = FVector(
-			StartLocation.X - DiagonalVerticalDistance,
-			StartLocation.Y - DiagonalHorizontalDistance,
-			StartLocation.Z
-		);
-		break;
-
-	default:						
-		break;
-	}
-
-	return InstanceLocation;
-
-}

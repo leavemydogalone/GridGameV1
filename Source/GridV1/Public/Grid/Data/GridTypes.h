@@ -6,18 +6,33 @@
 #include "UObject/ObjectMacros.h"
 #include "GridTypes.generated.h"
 
+UENUM(BlueprintType)
+enum class EHexMoveType : uint8
+{
+	None,
+	Forward,
+	Backward,
+	ForwardLeft,
+	ForwardRight,
+	BackwardLeft,
+	BackwardRight,
+	RotateLeft,
+	RotateRight
+};
+
 // Will need to convert this to left/right verbiage
 UENUM(BlueprintType)
 enum class EHexDirection : uint8
 {
-	None		UMETA(DisplayName = "None"),
-	Left		UMETA(DisplayName = "Left"),
-	Right		UMETA(DisplayName = "Right"),
-	UpRight		UMETA(DisplayName = "UpRight"),
-	UpLeft		UMETA(DisplayName = "UpLeft"),
-	DownRight	UMETA(DisplayName = "DownRight"),
-	DownLeft	UMETA(DisplayName = "DownLeft"),
+	North		UMETA(DisplayName = "North"),
+	South		UMETA(DisplayName = "South"),
+	NorthEast	UMETA(DisplayName = "NorthEast"),
+	NorthWest	UMETA(DisplayName = "NorthWest"),
+	SouthEast	UMETA(DisplayName = "SouthEast"),
+	SouthWest	UMETA(DisplayName = "SouthWest"),
 };
+
+
 
 USTRUCT(BlueprintType)
 struct FCubeCoord

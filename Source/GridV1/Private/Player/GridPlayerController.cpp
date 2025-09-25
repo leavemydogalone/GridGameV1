@@ -6,7 +6,9 @@
 #include "Character/GridV1CharacterBase.h"
 #include "Grid/GridFunctionLibrary.h"
 #include "Input/GridV1InputConfig.h"
+#include "Grid/Data/GridTypes.h"
 #include "GridV1GameplayTags.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Input/GridV1EnhancedInputComponent.h"
 
 AGridPlayerController::AGridPlayerController()
@@ -91,51 +93,83 @@ void AGridPlayerController::Move(const FInputActionValue& InputActionValue)
 	}
 }
 
-void AGridPlayerController::HandleMoveInput(EHexDirection HexDirection)
+void AGridPlayerController::HandleMoveInput(const FInputActionValue& InputActionValue)
 {
 	AGridV1CharacterBase* Char = Cast<AGridV1CharacterBase>(GetPawn());
 	if (!Char) return;
 
-	const FRotator Rotation = GetControlRotation();
-	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 
+	// Will need to account for camera rotation here later
 
-	//const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	//const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	if (!bCanMove) return;
 
-	// We will also want to pass the player controller direction
-	Char->HandleDirectionalInput(YawRotation, HexDirection);
+	if (!bMovementInputBuffered)
+	{
+		BufferedMovementInput = InputAxisVector;
+		bMovementInputBuffered = true;
+
+		GetWorld()->GetTimerManager().SetTimer(
+			MovementInputBufferHandle,
+			this,
+			&AGridPlayerController::ResolveBufferedInput,
+			MovementInputBufferTime,
+			false
+		);
+	}
+	else
+	{
+		BufferedMovementInput += InputAxisVector;
+	}
 
 }
 
-
-
-void AGridPlayerController::MoveRight()
+void AGridPlayerController::ResolveBufferedInput()
 {
-	HandleMoveInput(EHexDirection::Right);
+	bMovementInputBuffered = false;
+
+	// Normalize to -1/0/1 per axis
+	int X = FMath::Clamp(FMath::RoundToInt(BufferedMovementInput.X), -1, 1);
+	int Y = FMath::Clamp(FMath::RoundToInt(BufferedMovementInput.Y), -1, 1);
+
+	EHexMoveType MoveType = ResolveHexInput(FVector2D(X, Y));
+
+	if (MoveType != EHexMoveType::None)
+	{
+		ExecuteMove(MoveType);
+		//StartMoveCooldown();
+	}
+
+	BufferedMovementInput = FVector2D::ZeroVector;
 }
 
-void AGridPlayerController::MoveLeft()
+EHexMoveType AGridPlayerController::ResolveHexInput(FVector2D Input)
 {
-	HandleMoveInput(EHexDirection::Left);
+	int X = FMath::RoundToInt(Input.X);
+	int Y = FMath::RoundToInt(Input.Y);
+
+	if (Y > 0 && X == 0) return EHexMoveType::Forward;
+	if (Y < 0 && X == 0) return EHexMoveType::Backward;
+	if (Y > 0 && X < 0) return EHexMoveType::ForwardLeft;
+	if (Y > 0 && X > 0) return EHexMoveType::ForwardRight;
+	if (Y < 0 && X < 0) return EHexMoveType::BackwardLeft;
+	if (Y < 0 && X > 0) return EHexMoveType::BackwardRight;
+
+	// If only A or D, treat as rotation
+	if (X < 0 && Y == 0) return EHexMoveType::RotateLeft;
+	if (X > 0 && Y == 0) return EHexMoveType::RotateRight;
+
+	return EHexMoveType::None;
 }
 
-void AGridPlayerController::MoveUpRight()
+void AGridPlayerController::ExecuteMove(EHexMoveType)
 {
-	HandleMoveInput(EHexDirection::UpRight);
-}
+	// Get the hex in direction
 
-void AGridPlayerController::MoveUpLeft()
-{
-	HandleMoveInput(EHexDirection::UpLeft);
-}
+	// Get current hex to then get the hex in provided direction
 
-void AGridPlayerController::MoveDownRight()
-{
-	HandleMoveInput(EHexDirection::DownRight);
-}
 
-void AGridPlayerController::MoveDownLeft()
-{
-	HandleMoveInput(EHexDirection::DownLeft);
+	//UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+
+
 }

@@ -47,15 +47,17 @@ private:
 
 	void Move(const FInputActionValue& InputActionValue);
 
-	void HandleMoveInput(EHexDirection HexDirection);
+	void HandleMoveInput(const FInputActionValue& InputActionValue);
+	void ResolveBufferedInput();
+	EHexMoveType ResolveHexInput(FVector2D Input);
+	void ExecuteMove(EHexMoveType);
 
 
-	void MoveRight();
-	void MoveLeft();
-	void MoveUpRight();
-	void MoveUpLeft();
-	void MoveDownRight();
-	void MoveDownLeft();
+	FTimerHandle MovementInputBufferHandle;
+	FVector2D BufferedMovementInput;
+	bool bMovementInputBuffered = false;
+	bool bCanMove = true;
 
-
+	UPROPERTY(EditDefaultsOnly, Category = "Input Controls")
+	float MovementInputBufferTime = 0.05f;
 };

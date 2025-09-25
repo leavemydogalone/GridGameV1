@@ -26,4 +26,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
 	void GetCurrentHexAtLocation(FVector Location);
+
+	/*UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
+	FVector GetLocationOfNextHexInDirection(FHex Hex);*/
 };

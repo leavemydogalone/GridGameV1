@@ -9,7 +9,7 @@
 #include <vector>
 #include "GridFunctionLibrary.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FHex
 {
 	GENERATED_BODY();
@@ -223,9 +223,4 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static AActor* GetGridManager(UObject* WorldContextObject);
 
-	UFUNCTION(BlueprintCallable, Category = "Grid")
-	static FVector SnapVectorToVector(FVector V1, FVector V2);
-
-	UFUNCTION(BlueprintCallable, Category = "Grid")
-	static FVector GetNextHexCenterInDirection(FVector StartLocation, const EHexDirection Direction);
 };

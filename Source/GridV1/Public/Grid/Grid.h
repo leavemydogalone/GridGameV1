@@ -22,8 +22,17 @@ public:
 	
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	/* Grid Interface */
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	void GetCurrentHexAtLocation_Implementation(FVector Location) override;
+
+
+	//UFUNCTION(BlueprintCallable, Category = "Grid")
+	//FVector GetLocationOfNextHexInDirection_Implementation(FVector StartLocation, FHex Hex) override;
+
+	/* End Grid Interface */
+
+
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	bool DebugVisuals = false;

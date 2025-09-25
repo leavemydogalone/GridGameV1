@@ -32,7 +32,6 @@ void AGrid::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	GridHexagons->SetStaticMesh(HexagonMesh);
 	GridHexagons->SetMaterial(0, HexagonMaterial);
-	GridHexagons->SetWorldScale3D(TileScale);
 
 	GridCenterCylinders->SetStaticMesh(CylinderMesh);
 	SpawnGrid();
@@ -47,12 +46,16 @@ void AGrid::GetCurrentHexAtLocation_Implementation(FVector Location)
 	UE_LOG(LogGrid, Log, TEXT("Current Hex Position: %s"), *CoordText);
 }
 
+//FVector AGrid::GetLocationOfNextHexInDirection_Implementation(FVector StartLocation, FHex Hex)
+//{
+//	return FVector();
+//}
+
 void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
 	GridHexagons->SetStaticMesh(HexagonMesh);
 	GridHexagons->SetMaterial(0, HexagonMaterial);
-	//GridHexagons->SetWorldScale3D(TileScale);
 
 	GridCenterCylinders->SetStaticMesh(CylinderMesh);
 
@@ -99,11 +102,8 @@ void AGrid::SpawnHexagonalGrid()
 		{
 			FString CoordText = FString::Printf(TEXT("Q:%d R:%d S:%d"), Hex.q, Hex.r, Hex.s);
 
-			UTextRenderComponent* TextComp = NewObject<UTextRenderComponent>(this);
-			TextComp->SetText(FText::FromString(CoordText));
-			TextComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
-			TextComp->RegisterComponent();
-			TextComp->SetWorldLocation(WorldPos + FVector(0, 0, 150));
+			DrawDebugString(GetWorld(), WorldPos + FVector(0, 0, 250.f), CoordText, nullptr, FColor::Blue, 1000.f, true);
+
 		}
 
 		// Or: spawn an actor/ISM instance at WorldPos
