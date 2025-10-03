@@ -143,6 +143,8 @@ void AGridPlayerController::ExecuteMove(EHexMoveType MoveType)
 
 		const IGridInterface* GridManager = Cast<IGridInterface>(UGridFunctionLibrary::GetGridManager(ControlledPawn));
 
+		if (!GridManager) return;
+
 		int32 Direction = FMath::FloorToInt(Rotation.Yaw / 60.f);
 
 		//FHex HexDirection = UGridFunctionLibrary::hex_directions[RotationToMovementDirection];
@@ -187,7 +189,10 @@ void AGridPlayerController::ExecuteMove(EHexMoveType MoveType)
 
 		FVector ThreeDTarget = FVector(TargetLocation.X, TargetLocation.Y, ControlledPawn->GetActorLocation().Z);
 
+		// Will need to convert this into a move on tick (until reaching destination) function later
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ThreeDTarget);
+
+		DrawDebugSphere(GetWorld(), ThreeDTarget, 50.f, 12, FColor::Red, false, 2.f);
 
 	}
 

@@ -73,9 +73,7 @@ void AGrid::SpawnGrid()
 	GridTileCount.Y = FMath::RoundToInt(GridTileCount.Y);
 
 	SpawnHexagonalGrid();
-	GridHexagons->SetCustomDataValue(3, 0, 1, true);
-	GridHexagons->SetCustomDataValue(7, 0, 2, true);
-
+	GridHexagons->SetCustomDataValue(3, 0, 1);
 }
 
 void AGrid::SetUpGrid()

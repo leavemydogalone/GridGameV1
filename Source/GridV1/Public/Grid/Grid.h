@@ -26,11 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	void GetCurrentHexAtLocation_Implementation(FVector Location) override;
 
-
 	FVector2D GetNextHexCenter_Implementation(FVector StartLocation, int32 Direction) override;
 
 	/* End Grid Interface */
-
 
 
 	UPROPERTY(EditAnywhere, Category = "Grid")
@@ -43,7 +41,7 @@ protected:
 private:
 
 	/* Hex Grid */
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "Grid")
 	TObjectPtr<UInstancedStaticMeshComponent> GridHexagons;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid")

@@ -36,8 +36,6 @@ protected:
 
 	virtual void SetupInputComponent() override;
 
-
-
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> GridV1Context;
