@@ -7,6 +7,8 @@
 #include "DeveloperSettings/GridV1DeveloperSettings.h"
 #include "Components/TextRenderComponent.h"
 #include "Grid/GridFunctionLibrary.h"
+#include "Net/UnrealNetwork.h"
+
 
 DEFINE_LOG_CATEGORY(LogGrid);
 
@@ -33,6 +35,13 @@ void AGrid::OnConstruction(const FTransform& Transform)
 	SetUpGrid();
 	SpawnGrid();
 }
+
+//void AGrid::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+//{
+//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+//	DOREPLIFETIME(AGrid, MapContainer);
+//}
 
 void AGrid::BeginPlay()
 {
@@ -61,12 +70,17 @@ FVector2D AGrid::GetNextHexCenter_Implementation(FVector StartLocation, int32 Di
 
 void AGrid::HandlePlayerMoveIntoHex_Implementation(FVector Location, int32 TeamId)
 {
-	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
-	if (const FHex* FoundHexIndex = MapContainer.Find(Hex))
+	if (!HasAuthority())
 	{
-		
-		GridHexagons->SetCustomDataValue(FoundHexIndex->Index, 0, TeamId, true);
+		/*Server_HandlePlayerMoveIntoHex(Location, TeamId);*/
+		return;
+	}
 
+	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
+	if (FHex* FoundHex = MapContainer.Find(Hex))
+	{
+		FoundHex->TeamId = TeamId;
+		Multicast_UpdateHexTeam(FoundHex->Index, TeamId);
 	}
 	else
 	{
@@ -128,4 +142,10 @@ void AGrid::SpawnHexagonalGrid()
 		GridHexagons->AddInstanceWorldSpace(InstanceTransform);
 	}
 }
+
+void AGrid::Multicast_UpdateHexTeam_Implementation(int32 Index, int32 TeamId)
+{
+	GridHexagons->SetCustomDataValue(Index, 0, TeamId, true);
+}
+
 

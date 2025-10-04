@@ -17,7 +17,6 @@ AGridV1CharacterBase::AGridV1CharacterBase()
 
 void AGridV1CharacterBase::SetCachedTargetLocation(const FVector& NewLocation)
 {
-    PreviousLocation = GetActorLocation();
     CachedTargetLocation = NewLocation;
 }
 
@@ -25,6 +24,7 @@ void AGridV1CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PreviousHexCenterReached = GetActorLocation();
 }
 
 void AGridV1CharacterBase::Tick(float DeltaTime)
@@ -48,14 +48,15 @@ void AGridV1CharacterBase::HandleMove()
         return;
     }
 
-	HandleGridInteraction();
+	Server_HandleGridInteraction();
 
     const float Distance = FVector::Dist2D(GetActorLocation(), CachedTargetLocation);
 
-    if (Distance < 5.f) // tolerance in Unreal units
+    if (Distance < 5.f) // tolerance
     {
         // Snap exactly to target so drift doesn't accumulate
         SetActorLocation(CachedTargetLocation);
+		PreviousHexCenterReached = CachedTargetLocation;
         CachedTargetLocation = FVector::ZeroVector;
         return;
     }
@@ -64,12 +65,10 @@ void AGridV1CharacterBase::HandleMove()
     AddMovementInput(Direction, 1.0f);
 }
 
-void AGridV1CharacterBase::HandleGridInteraction()
+void AGridV1CharacterBase::Server_HandleGridInteraction_Implementation()
 {
-    //The below is buggy and skips some hexes if the player holds down input
-
 	// See if actor is more than halfway between startinglocation and cachedtargetlocation
-    if (FVector::Dist2D(GetActorLocation(), PreviousLocation) > FVector::Dist2D(CachedTargetLocation, PreviousLocation) / 2)
+    if (FVector::Dist2D(GetActorLocation(), PreviousHexCenterReached) > FVector::Dist2D(CachedTargetLocation, PreviousHexCenterReached) / 2)
     {
         IGridInterface::Execute_HandlePlayerMoveIntoHex(UGridFunctionLibrary::GetGridManager(this), GetActorLocation(), TeamId);
     }

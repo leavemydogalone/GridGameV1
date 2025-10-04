@@ -19,14 +19,16 @@ class GRIDV1_API AGrid : public AActor , public IGridInterface
 public:	
 	// Sets default values for this actor's properties
 	AGrid();
-	
 	virtual void OnConstruction(const FTransform& Transform) override;
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 	/* Grid Interface */
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	void GetCurrentHexAtLocation_Implementation(FVector Location) override;
 
 	FVector2D GetNextHexCenter_Implementation(FVector StartLocation, int32 Direction) override;
+
+	//make this a server function and then do a multicast to all clients to update the hex
 
 	void HandlePlayerMoveIntoHex_Implementation(FVector Location, int32 TeamId) override;
 
@@ -86,5 +88,9 @@ private:
 	void SpawnHexagonalGrid();
 
 	TSet<FHex> MapContainer;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateHexTeam(int32 Index, int32 TeamId);
+
 	FLayout GridLayout;
 };

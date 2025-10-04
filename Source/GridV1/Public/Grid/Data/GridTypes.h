@@ -43,6 +43,7 @@ struct FHex
 
 	bool Occupied = false;
 
+	int32 TeamId = 0;
 	int32 Index = -1;
 
 	FHex(int32 Inq, int32 Inr, int32 Ins)

@@ -32,10 +32,12 @@ protected:
 private:
     
 	FVector CachedTargetLocation = FVector::ZeroVector;
-	FVector PreviousLocation = FVector::ZeroVector;
+	FVector PreviousHexCenterReached = FVector::ZeroVector;
 
 	int32 TeamId = 1;
 
 	void HandleMove();
-	void HandleGridInteraction();
+
+	UFUNCTION(Server, Reliable)
+	void Server_HandleGridInteraction();
 };
