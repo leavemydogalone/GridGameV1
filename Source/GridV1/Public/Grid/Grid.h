@@ -28,6 +28,8 @@ public:
 
 	FVector2D GetNextHexCenter_Implementation(FVector StartLocation, int32 Direction) override;
 
+	void HandlePlayerMoveIntoHex_Implementation(FVector Location, int32 TeamId) override;
+
 	/* End Grid Interface */
 
 

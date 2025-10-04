@@ -58,4 +58,5 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input Controls")
 	float MovementInputBufferTime = 0.05f;
+
 };

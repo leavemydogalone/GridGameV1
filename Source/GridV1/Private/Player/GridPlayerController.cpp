@@ -137,7 +137,7 @@ EHexMoveType AGridPlayerController::ResolveHexInput(FVector2D Input)
 
 void AGridPlayerController::ExecuteMove(EHexMoveType MoveType)
 {
-	if (APawn* ControlledPawn = GetPawn<APawn>())
+	if (AGridV1CharacterBase* ControlledPawn = GetPawn<AGridV1CharacterBase>())
 	{
 		FRotator Rotation = GetControlRotation();
 
@@ -190,7 +190,9 @@ void AGridPlayerController::ExecuteMove(EHexMoveType MoveType)
 		FVector ThreeDTarget = FVector(TargetLocation.X, TargetLocation.Y, ControlledPawn->GetActorLocation().Z);
 
 		// Will need to convert this into a move on tick (until reaching destination) function later
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ThreeDTarget);
+		//UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ThreeDTarget);
+
+		ControlledPawn->SetCachedTargetLocation(ThreeDTarget);
 
 		DrawDebugSphere(GetWorld(), ThreeDTarget, 50.f, 12, FColor::Red, false, 2.f);
 

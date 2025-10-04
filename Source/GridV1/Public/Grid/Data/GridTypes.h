@@ -41,6 +41,10 @@ struct FHex
 	int32 r;
 	int32 s;
 
+	bool Occupied = false;
+
+	int32 Index = -1;
+
 	FHex(int32 Inq, int32 Inr, int32 Ins)
 		: q(Inq), r(Inr), s(Ins)
 	{

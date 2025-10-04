@@ -15,6 +15,11 @@ class GRIDV1_API AGridV1CharacterBase : public ACharacter
 public:
 	AGridV1CharacterBase();
 
+	void SetCachedTargetLocation(const FVector& NewLocation);
+
+	UFUNCTION(BlueprintCallable, Category = "Grid Character")
+	FVector GetCachedTargetLocation() const { return CachedTargetLocation; };
+
 	virtual void Tick(float DeltaTime) override;
 
 
@@ -26,5 +31,11 @@ protected:
 
 private:
     
+	FVector CachedTargetLocation = FVector::ZeroVector;
+	FVector PreviousLocation = FVector::ZeroVector;
 
+	int32 TeamId = 1;
+
+	void HandleMove();
+	void HandleGridInteraction();
 };

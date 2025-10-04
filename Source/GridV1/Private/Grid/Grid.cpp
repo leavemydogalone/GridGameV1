@@ -59,8 +59,22 @@ FVector2D AGrid::GetNextHexCenter_Implementation(FVector StartLocation, int32 Di
 	return FVector2D(WorldPos2D.X, WorldPos2D.Y);
 }
 
+void AGrid::HandlePlayerMoveIntoHex_Implementation(FVector Location, int32 TeamId)
+{
+	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
+	if (const FHex* FoundHexIndex = MapContainer.Find(Hex))
+	{
+		
+		GridHexagons->SetCustomDataValue(FoundHexIndex->Index, 0, TeamId, true);
 
+	}
+	else
+	{
+		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for player move"));
+		return;
 
+	}
+}
 
 
 void AGrid::SpawnGrid()
@@ -73,8 +87,6 @@ void AGrid::SpawnGrid()
 	GridTileCount.Y = FMath::RoundToInt(GridTileCount.Y);
 
 	SpawnHexagonalGrid();
-	GridHexagons->SetCustomDataValue(3, 0, 1, true);
-	GridHexagons->SetCustomDataValue(7, 0, 2, true);
 
 }
 

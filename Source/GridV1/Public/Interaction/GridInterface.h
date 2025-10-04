@@ -29,4 +29,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
 	FVector2D GetNextHexCenter(FVector StartLocation, int32 Direction);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
+	void HandlePlayerMoveIntoHex(FVector Location, int32 TeamId);
 };

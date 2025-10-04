@@ -182,10 +182,15 @@ public:
 		int32 right = Width;
 		int32 bottom = Height;
 
+		int32 Index = 0;
+
 		for (int q = left; q <= right; q++) { // flat top
 			int q_offset = floor(q / 2.0); // or q>>1
 			for (int r = top - q_offset; r <= bottom - q_offset; r++) {
-				MapContainer.Emplace(FHex(q, r, -q - r));
+				FHex NewHex = FHex(q, r, -q - r);
+				NewHex.Index = Index;
+				MapContainer.Emplace(NewHex);
+				Index++;
 			}
 		}
 	}
