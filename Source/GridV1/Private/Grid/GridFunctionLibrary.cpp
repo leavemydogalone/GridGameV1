@@ -52,3 +52,15 @@ AActor* UGridFunctionLibrary::GetGridManager(UObject* WorldContextObject)
 	return UGameplayStatics::GetActorOfClass(WorldContextObject, AGrid::StaticClass());
 }
 
+FVector UGridFunctionLibrary::Convert2DTo3DActorHeight(FVector2D& InVector, const FVector& ActorLocation)
+{
+	return FVector(InVector.X, InVector.Y, ActorLocation.Z);
+}
+
+FVector2D UGridFunctionLibrary::Convert3DTo2D(const FVector& InVector)
+{
+	return FVector2D(InVector.X, InVector.Y);
+}
+
+
+

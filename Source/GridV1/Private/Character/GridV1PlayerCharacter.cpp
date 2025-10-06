@@ -43,6 +43,10 @@ AGridV1PlayerCharacter::AGridV1PlayerCharacter()
 
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.bStartWithTickEnabled = true;
+
+
+
+	// I have also added camera lag, updated the max acceleration, and braking speed in BP
 }
 
 void AGridV1PlayerCharacter::Tick(float DeltaSeconds)

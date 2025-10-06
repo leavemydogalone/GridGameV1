@@ -185,16 +185,7 @@ void AGridPlayerController::ExecuteMove(EHexMoveType MoveType)
 
 		if (Direction >= 6) Direction -= 6;
 
-		const FVector2D TargetLocation = IGridInterface::Execute_GetNextHexCenter(UGridFunctionLibrary::GetGridManager(ControlledPawn), ControlledPawn->GetActorLocation(), Direction);
-
-		FVector ThreeDTarget = FVector(TargetLocation.X, TargetLocation.Y, ControlledPawn->GetActorLocation().Z);
-
-		// Will need to convert this into a move on tick (until reaching destination) function later
-		//UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ThreeDTarget);
-
-		ControlledPawn->SetCachedTargetLocation(ThreeDTarget);
-
-		DrawDebugSphere(GetWorld(), ThreeDTarget, 50.f, 12, FColor::Red, false, 2.f);
+		ControlledPawn->HandleMovementDirectionInput(Direction);
 
 	}
 

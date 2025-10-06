@@ -7,6 +7,7 @@
 #include "DeveloperSettings/GridV1DeveloperSettings.h"
 #include "Components/TextRenderComponent.h"
 #include "Grid/GridFunctionLibrary.h"
+#include "Grid/Data/GridTypes.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -22,26 +23,14 @@ AGrid::AGrid()
 
 	GridCenterCylinders = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridCenterCylinders"));
 	GridCenterCylinders->SetupAttachment(GetRootComponent());
-
-	// Fix: Construct GridLayout as a local variable and assign its value to the member variable
-
 }
 
-
-//Called when an instance of this class is placed (in editor) or spawned
 void AGrid::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	SetUpGrid();
 	SpawnGrid();
 }
-
-//void AGrid::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-//{
-//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-//
-//	DOREPLIFETIME(AGrid, MapContainer);
-//}
 
 void AGrid::BeginPlay()
 {
@@ -51,16 +40,21 @@ void AGrid::BeginPlay()
 	SpawnGrid();
 }
 
-void AGrid::GetCurrentHexAtLocation_Implementation(FVector Location)
+FVector2D AGrid::GetHexCenterAtLocation(FVector Location)
 {
 	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
-	FString CoordText = FString::Printf(TEXT("Q:%d R:%d S:%d"), Hex.q, Hex.r, Hex.s);
+	FVector2D HexLocation = UGridFunctionLibrary::hex_to_pixel(GridLayout, Hex);
 
-	//Add log of coortext
-	UE_LOG(LogGrid, Log, TEXT("Current Hex Position: %s"), *CoordText);
+	return HexLocation;
+
 }
 
-FVector2D AGrid::GetNextHexCenter_Implementation(FVector StartLocation, int32 Direction)
+FHex AGrid::GetHexAtLocation(FVector2D Location)
+{
+	return UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, Location);
+}
+
+FVector2D AGrid::GetNextHexCenter(FVector StartLocation, int32 Direction)
 {
 	FHex CurrentHex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(StartLocation.X, StartLocation.Y));
 	FHex Neighbor = UGridFunctionLibrary::hex_neighbor(CurrentHex, Direction);
@@ -68,17 +62,17 @@ FVector2D AGrid::GetNextHexCenter_Implementation(FVector StartLocation, int32 Di
 	return FVector2D(WorldPos2D.X, WorldPos2D.Y);
 }
 
-void AGrid::HandlePlayerMoveIntoHex_Implementation(FVector Location, int32 TeamId)
+void AGrid::HandlePlayerMoveIntoHex(FVector Location, int32 TeamId)
 {
 	if (!HasAuthority())
 	{
-		/*Server_HandlePlayerMoveIntoHex(Location, TeamId);*/
 		return;
 	}
 
 	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
 	if (FHex* FoundHex = MapContainer.Find(Hex))
 	{
+		FoundHex->Occupied = true;
 		FoundHex->TeamId = TeamId;
 		Multicast_UpdateHexTeam(FoundHex->Index, TeamId);
 	}
@@ -90,6 +84,65 @@ void AGrid::HandlePlayerMoveIntoHex_Implementation(FVector Location, int32 TeamI
 	}
 }
 
+bool AGrid::CanPlayerMoveIntoHex(FVector Location, int32 TeamId)
+{
+	if (!HasAuthority())
+	{
+		return false;
+	}
+	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
+	if (FHex* FoundHex = MapContainer.Find(Hex))
+	{
+		return !FoundHex->Occupied;
+	}
+	else
+	{
+		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for CanPlayerMoveIntoHex"));
+		return false;
+	}
+}
+
+bool AGrid::IsHexOccupiedOrReserved(FVector2D Location)
+{
+	if (!HasAuthority())
+	{
+		return true;
+	}
+	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
+	if (FHex* FoundHex = MapContainer.Find(Hex))
+	{
+		return FoundHex->OccupancyState != EOccupancyStates::Free;
+	}
+	else
+	{
+		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for CanPlayerMoveIntoHex"));
+	}
+	return true;
+}
+
+bool AGrid::TryEnterHex(FHex CurrentHex, FHex Hex)
+{
+	if (FHex* FoundHex = MapContainer.Find(Hex))
+	{
+		FoundHex->OccupancyState = EOccupancyStates::Reserved;
+		return true;
+	}
+	else
+	{
+		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for CanPlayerMoveIntoHex"));
+	}
+	return false;
+}
+
+void AGrid::Multicast_UpdateHexTeam_Implementation(int32 Index, int32 TeamId)
+{
+	GridHexagons->SetCustomDataValue(Index, 0, TeamId, true);
+}
+
+
+
+
+/* Grid Generation */ 
 
 void AGrid::SpawnGrid()
 {
@@ -138,14 +191,8 @@ void AGrid::SpawnHexagonalGrid()
 		}
 
 		// Or: spawn an actor/ISM instance at WorldPos
-		const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, WorldPos, TileScale);
+		const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, WorldPos);
 		GridHexagons->AddInstanceWorldSpace(InstanceTransform);
 	}
 }
-
-void AGrid::Multicast_UpdateHexTeam_Implementation(int32 Index, int32 TeamId)
-{
-	GridHexagons->SetCustomDataValue(Index, 0, TeamId, true);
-}
-
 

@@ -24,12 +24,25 @@ class GRIDV1_API IGridInterface
 	
 public:
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
-	void GetCurrentHexAtLocation(FVector Location);
+	UFUNCTION()
+	virtual FVector2D GetHexCenterAtLocation(FVector Location) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
-	FVector2D GetNextHexCenter(FVector StartLocation, int32 Direction);
+	UFUNCTION()
+	virtual FHex GetHexAtLocation(FVector2D Location) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid")
-	void HandlePlayerMoveIntoHex(FVector Location, int32 TeamId);
+	UFUNCTION()
+	virtual FVector2D GetNextHexCenter(FVector StartLocation, int32 Direction) = 0;
+
+	UFUNCTION()
+	virtual void HandlePlayerMoveIntoHex(FVector Location, int32 TeamId) = 0;
+
+	UFUNCTION()
+	virtual bool CanPlayerMoveIntoHex(FVector Location, int32 TeamId) = 0;
+
+	UFUNCTION()
+	virtual bool IsHexOccupiedOrReserved(FVector2D Location) = 0;
+
+	UFUNCTION()
+	virtual bool TryEnterHex(FHex CurrentHex, FHex Hex) = 0;
+
 };

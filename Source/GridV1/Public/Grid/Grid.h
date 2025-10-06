@@ -20,17 +20,22 @@ public:
 	// Sets default values for this actor's properties
 	AGrid();
 	virtual void OnConstruction(const FTransform& Transform) override;
-	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 	/* Grid Interface */
-	UFUNCTION(BlueprintCallable, Category = "Grid")
-	void GetCurrentHexAtLocation_Implementation(FVector Location) override;
-
-	FVector2D GetNextHexCenter_Implementation(FVector StartLocation, int32 Direction) override;
-
-	//make this a server function and then do a multicast to all clients to update the hex
-
-	void HandlePlayerMoveIntoHex_Implementation(FVector Location, int32 TeamId) override;
+	UFUNCTION()
+	virtual FVector2D GetHexCenterAtLocation(FVector Location) override;
+	UFUNCTION()
+	virtual FHex GetHexAtLocation(FVector2D Location) override;
+	UFUNCTION()
+	virtual FVector2D GetNextHexCenter(FVector StartLocation, int32 Direction) override;
+	UFUNCTION()
+	virtual void HandlePlayerMoveIntoHex(FVector Location, int32 TeamId) override;
+	UFUNCTION()
+	virtual bool CanPlayerMoveIntoHex(FVector Location, int32 TeamId) override;
+	UFUNCTION()
+	virtual bool IsHexOccupiedOrReserved(FVector2D Location) override;
+	UFUNCTION()
+	virtual bool TryEnterHex(FHex CurrentHex, FHex Hex) override;
 
 	/* End Grid Interface */
 
@@ -54,10 +59,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Grid")
 	TObjectPtr<UMaterialInterface> HexagonMaterial;
 
-	//This is so we can see the updated tile size in the editor preview. Will be overriden in play
-	UPROPERTY(EditAnywhere, Category = "Grid")
-	FVector TileScale = FVector(1.f, 1.f, 1.f);
-
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	FVector GridTileSize = FVector(100.f, 100.f, 100.f);
 
@@ -71,12 +72,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInstancedStaticMeshComponent> GridCenterCylinders;
 
-	// Adjustable radius for overlap cylinders
-	UPROPERTY(EditAnywhere, Category = "Grid")
-	float CenterRadius = 50.f;
-
-	UPROPERTY(EditAnywhere, Category = "Grid")
-	float CenterHeight = 100.f;
 
 	UFUNCTION()
 	void SpawnGrid();
@@ -87,10 +82,10 @@ private:
 
 	void SpawnHexagonalGrid();
 
+	FLayout GridLayout;
 	TSet<FHex> MapContainer;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_UpdateHexTeam(int32 Index, int32 TeamId);
 
-	FLayout GridLayout;
 };

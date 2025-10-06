@@ -32,6 +32,14 @@ enum class EHexDirection : uint8
 	SouthWest	UMETA(DisplayName = "SouthWest"),
 };
 
+UENUM(BlueprintType)
+enum class EOccupancyStates : uint8
+{
+	Free		UMETA(DisplayName = "Free"),
+	Occupied	UMETA(DisplayName = "Occupied"),
+	Reserved	UMETA(DisplayName = "Reserved"),
+};
+
 USTRUCT(BlueprintType)
 struct FHex
 {
@@ -42,6 +50,7 @@ struct FHex
 	int32 s;
 
 	bool Occupied = false;
+	EOccupancyStates OccupancyState = EOccupancyStates::Free;
 
 	int32 TeamId = 0;
 	int32 Index = -1;
