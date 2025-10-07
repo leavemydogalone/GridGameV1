@@ -15,7 +15,13 @@ DEFINE_LOG_CATEGORY(LogGrid);
 
 AGrid::AGrid() 
 {
+#if WITH_EDITOR || UE_BUILD_DEVELOPMENT
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
+#else
 	PrimaryActorTick.bCanEverTick = false;
+#endif
+
 	bReplicates = true;
 	GridHexagons = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("GridMesh"));
 	
@@ -30,6 +36,28 @@ void AGrid::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	SetUpGrid();
 	SpawnGrid();
+}
+
+void AGrid::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (DebugVisuals)
+	{
+		for (FHex& Hex : MapContainer)
+		{
+			FString CoordText = FString::Printf(TEXT("Q:%d R:%d S:%d"), Hex.q, Hex.r, Hex.s);
+			FString OccupancyText = FString::Printf(TEXT("Occupancy:%d"), Hex.OccupancyState);
+
+			FVector WorldPos = FVector(UGridFunctionLibrary::hex_to_pixel(GridLayout, Hex).X, UGridFunctionLibrary::hex_to_pixel(GridLayout, Hex).Y, 0.f);
+
+			DrawDebugString(GetWorld(), WorldPos + FVector(0, 0, 250.f), CoordText, nullptr, FColor::Blue, 0.f, true);
+			DrawDebugString(GetWorld(), WorldPos + FVector(0, 0, 150.f), OccupancyText, nullptr, FColor::Blue, 0.f, true);
+
+		}
+		
+
+	}
 }
 
 void AGrid::BeginPlay()
@@ -89,52 +117,43 @@ void AGrid::HandlePlayerMoveIntoHex(FVector Location, int32 TeamId)
 	}
 }
 
-bool AGrid::CanPlayerMoveIntoHex(FVector Location, int32 TeamId)
-{
-	if (!HasAuthority())
-	{
-		return false;
-	}
-	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
-	if (FHex* FoundHex = MapContainer.Find(Hex))
-	{
-		return !FoundHex->Occupied;
-	}
-	else
-	{
-		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for CanPlayerMoveIntoHex"));
-		return false;
-	}
-}
-
-bool AGrid::IsHexOccupiedOrReserved(FVector2D Location)
-{
-	if (!HasAuthority())
-	{
-		return true;
-	}
-	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));
-	if (FHex* FoundHex = MapContainer.Find(Hex))
-	{
-		return FoundHex->OccupancyState != EOccupancyStates::Free;
-	}
-	else
-	{
-		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for CanPlayerMoveIntoHex"));
-	}
-	return true;
-}
-
-bool AGrid::TryEnterHex(FHex CurrentHex, FHex Hex)
+bool AGrid::TryEnterHex(const FHex& CurrentHex, const FHex& Hex)
 {
 	if (FHex* FoundHex = MapContainer.Find(Hex))
 	{
+		if (FoundHex->OccupancyState != EOccupancyStates::Free)
+		{
+			return false;
+		}
 		FoundHex->OccupancyState = EOccupancyStates::Reserved;
 		return true;
 	}
 	else
 	{
-		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for CanPlayerMoveIntoHex"));
+		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for TryEnterHex"));
+	}
+	return false;
+}
+
+// For this I will eventually need to also verify that the previoushex has the pointer to the actor trying to occupy the new hex
+bool AGrid::TryOccupyHex(const FHex& Hex, const FHex& PreviousHex)
+{
+	if (FHex* FoundHex = MapContainer.Find(Hex))
+	{
+		FoundHex->OccupancyState = EOccupancyStates::Occupied;
+		if (FHex* FoundPreviousHex = MapContainer.Find(PreviousHex))
+		{
+			FoundPreviousHex->OccupancyState = EOccupancyStates::Free;
+		}
+		else
+		{
+			UE_LOG(LogGrid, Warning, TEXT("PreviousHex not found in MapContainer for TryOccupyHex"));
+		}
+		return true;
+	}
+	else
+	{
+		UE_LOG(LogGrid, Warning, TEXT("Hex not found in MapContainer for TryOccupyHex"));
 	}
 	return false;
 }
@@ -187,13 +206,7 @@ void AGrid::SpawnHexagonalGrid()
 		FVector2D WorldPos2D = UGridFunctionLibrary::hex_to_pixel(GridLayout, Hex);
 		FVector WorldPos(WorldPos2D.X, WorldPos2D.Y, 0.f);
 
-		if (DebugVisuals)
-		{
-			FString CoordText = FString::Printf(TEXT("Q:%d R:%d S:%d"), Hex.q, Hex.r, Hex.s);
-
-			DrawDebugString(GetWorld(), WorldPos + FVector(0, 0, 250.f), CoordText, nullptr, FColor::Blue, 1000.f, true);
-
-		}
+		
 
 		// Or: spawn an actor/ISM instance at WorldPos
 		const FTransform InstanceTransform = FTransform(FRotator::ZeroRotator, WorldPos);

@@ -43,46 +43,56 @@ void AGridV1CharacterBase::Tick(float DeltaTime)
 
 void AGridV1CharacterBase::HandleMove()
 {
-    if (TargetHexCenter == FVector::ZeroVector)
+    if (TargetHexCenter != FVector::ZeroVector && bIsMoving)
     {
-        return;
-    }
 
 
-    // Check the distance from the CurrentHex
-        // if > 30 - half < half, check if can enter hex
-            // bool GridManager->ActorTryEnterHex = reserve hex and return bool
-                // 
-        // if not, add movement input, maybe with higher scale
+        // Check the distance from the CurrentHex
+            // if > 30 - half < half, check if can enter hex
+                // bool GridManager->ActorTryEnterHex = reserve hex and return bool
+                    // 
+            // if not, add movement input, maybe with higher scale
 
-    // if cannot enter hex, set the target destination as currenthexcenter
+        // if cannot enter hex, set the target destination as currenthexcenter
 
-    const float Distance = FVector::Dist2D(GetActorLocation(), TargetHexCenter);
+        const float Distance = FVector::Dist2D(GetActorLocation(), TargetHexCenter);
 
-    //if(Distance)
+        //if(Distance)
 
+        //I don't think this is working as I'd like, will need to investigate some more
+        if (Distance < DistanceBetweenHexCenters / 2)
+		{
+			MovementScale = 10.f;
+		}
 
-    if (Distance < SnapToCenterDistance) // tolerance
-    {
-        SetActorLocation(TargetHexCenter);
-        CurrentHexCenter = TargetHexCenter;
-        TargetHexCenter = FVector::ZeroVector;
-		bIsMoving = false;
-        return;
-    }
+		if (Distance < SnapToCenterDistance)
+		{
+			if (HasAuthority() && bIsMoving)
+			{
+				Server_CompleteMoveIntoTargetHex_Implementation(TargetHex);
+			}
+			SetActorLocation(TargetHexCenter);
+			MovementScale = 2.f;
+			CurrentHexCenter = TargetHexCenter;
+			TargetHexCenter = FVector::ZeroVector;
+			bIsMoving = false;
+			return;
+		}
 
-    FVector Direction = (TargetHexCenter - GetActorLocation()).GetSafeNormal2D();
-    AddMovementInput(Direction, MovementScale);
+		FVector Direction = (TargetHexCenter - GetActorLocation()).GetSafeNormal2D();
+		AddMovementInput(Direction, MovementScale);
+	}
 }
 
-
-void AGridV1CharacterBase::Server_TryMoveIntoTargetHex_Implementation(const FHex& TargetHex)
+// This just reserves the hex
+void AGridV1CharacterBase::Server_TryMoveIntoTargetHex_Implementation(const FHex& Hex)
 {
     if (GetGridInterface())
     {
-        if (GetGridInterface()->TryEnterHex(CurrentHex, TargetHex))
+        if (GetGridInterface()->TryEnterHex(CurrentHex, Hex))
         {
-			TargetHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(UGridFunctionLibrary::hex_to_pixel(GetGridInterface()->GetLayout(), TargetHex), GetActorLocation());
+			TargetHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(UGridFunctionLibrary::hex_to_pixel(GetGridInterface()->GetLayout(), Hex), GetActorLocation());
+            TargetHex = Hex;
 			bIsMoving = true;
 
         }
@@ -92,14 +102,20 @@ void AGridV1CharacterBase::Server_TryMoveIntoTargetHex_Implementation(const FHex
     }
 }
 
-void AGridV1CharacterBase::OnRep_TargetHexCenter()
+void AGridV1CharacterBase::Server_CompleteMoveIntoTargetHex_Implementation(const FHex& Hex)
 {
-    //TargetHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(CachedMovementTarget, GetActorLocation());
-    bIsMoving = true;
+	if (GetGridInterface())
+	{
+		if (GetGridInterface()->TryOccupyHex(Hex, CurrentHex))
+		{
+			CurrentHex = Hex;
+		}
+	}
 }
 
-void AGridV1CharacterBase::OnRep_MovementScale()
+void AGridV1CharacterBase::OnRep_TargetHexCenter()
 {
+    bIsMoving = true;
 }
 
 TScriptInterface<IGridInterface> AGridV1CharacterBase::GetGridInterface()

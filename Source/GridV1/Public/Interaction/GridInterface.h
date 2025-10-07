@@ -40,12 +40,12 @@ public:
 	virtual void HandlePlayerMoveIntoHex(FVector Location, int32 TeamId) = 0;
 
 	UFUNCTION()
-	virtual bool CanPlayerMoveIntoHex(FVector Location, int32 TeamId) = 0;
+	virtual bool TryEnterHex(const FHex& CurrentHex, const FHex& Hex) = 0;
+
+	/*UFUNCTION()
+	virtual bool TryOccupyHex(FHex& Hex) = 0;*/
 
 	UFUNCTION()
-	virtual bool IsHexOccupiedOrReserved(FVector2D Location) = 0;
-
-	UFUNCTION()
-	virtual bool TryEnterHex(FHex CurrentHex, FHex Hex) = 0;
+	virtual bool TryOccupyHex(const FHex& Hex, const FHex& PreviousHex) = 0;
 
 };

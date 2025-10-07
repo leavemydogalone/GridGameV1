@@ -21,6 +21,8 @@ public:
 	AGrid();
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	virtual void Tick(float DeltaTime) override;
+
 	/* Grid Interface */
 	UFUNCTION()
 	virtual FLayout GetLayout() override;
@@ -33,11 +35,9 @@ public:
 	UFUNCTION()
 	virtual void HandlePlayerMoveIntoHex(FVector Location, int32 TeamId) override;
 	UFUNCTION()
-	virtual bool CanPlayerMoveIntoHex(FVector Location, int32 TeamId) override;
+	virtual bool TryEnterHex(const FHex& CurrentHex, const FHex& Hex) override;
 	UFUNCTION()
-	virtual bool IsHexOccupiedOrReserved(FVector2D Location) override;
-	UFUNCTION()
-	virtual bool TryEnterHex(FHex CurrentHex, FHex Hex) override;
+	virtual bool TryOccupyHex(const FHex& Hex, const FHex& PreviousHex) override;
 
 	/* End Grid Interface */
 

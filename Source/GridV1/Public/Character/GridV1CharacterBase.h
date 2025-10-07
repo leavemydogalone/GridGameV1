@@ -18,10 +18,6 @@ public:
 
 	void HandleMovementDirectionInput(const int32 Direction);
 
-
-	//UFUNCTION(BlueprintCallable, Category = "Grid Character")
-	//FVector GetCachedTargetLocation() const { return CachedTargetLocation; };
-
 	virtual void Tick(float DeltaTime) override;
 
 
@@ -35,10 +31,15 @@ private:
     
 	UPROPERTY(ReplicatedUsing = OnRep_TargetHexCenter)
 	FVector TargetHexCenter = FVector::ZeroVector;
+
+	UPROPERTY(Replicated)
+	FHex TargetHex = FHex(0, 0, 0);
+
+	UPROPERTY(Replicated)
 	FVector CurrentHexCenter = FVector::ZeroVector;
+
+	UPROPERTY(Replicated)
 	FHex CurrentHex = FHex(0, 0, 0);
-	FVector CurrentDestination = FVector::ZeroVector;
-	FVector2D CachedMovementTarget = FVector2D::ZeroVector;
 
 	bool bIsMoving = false;
 
@@ -46,7 +47,7 @@ private:
 	float MovementScale = 2.f;
 
 	UPROPERTY(EditAnywhere, Category = "Grid | Movement")
-	float SnapToCenterDistance = 15.f;
+	float SnapToCenterDistance = 40.f;
 
 	//I am hard-coding it here but will need to make a getter from the grid later
 	float DistanceBetweenHexCenters = 200.f;
@@ -56,15 +57,13 @@ private:
 	void HandleMove();
 
 	UFUNCTION(Server, Reliable)
-	void Server_TryMoveIntoTargetHex(const FHex& TargetHex);
+	void Server_TryMoveIntoTargetHex(const FHex& Hex);
+
+	UFUNCTION(Server, Reliable)
+	void Server_CompleteMoveIntoTargetHex(const FHex& Hex);
+
 	UFUNCTION()
 	void OnRep_TargetHexCenter();
-
-	UFUNCTION()
-	void OnRep_MovementScale();
-
-	//UFUNCTION(Server, Reliable)
-	//void Server_TryMoveIntoNew();
 
 	TScriptInterface<IGridInterface> GetGridInterface();
 
