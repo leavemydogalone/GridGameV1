@@ -23,6 +23,8 @@ public:
 
 	/* Grid Interface */
 	UFUNCTION()
+	virtual FLayout GetLayout() override;
+	UFUNCTION()
 	virtual FVector2D GetHexCenterAtLocation(FVector Location) override;
 	UFUNCTION()
 	virtual FHex GetHexAtLocation(FVector2D Location) override;

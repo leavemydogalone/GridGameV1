@@ -199,7 +199,7 @@ public:
 	static AActor* GetGridManager(UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
-	static FVector Convert2DTo3DActorHeight(FVector2D& InVector, const FVector& ActorLocation);
+	static FVector Convert2DTo3DActorHeight(const FVector2D& InVector, const FVector& ActorLocation);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FVector2D Convert3DTo2D(const FVector& InVector);

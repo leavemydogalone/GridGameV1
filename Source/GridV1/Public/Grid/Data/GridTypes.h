@@ -45,14 +45,20 @@ struct FHex
 {
 	GENERATED_BODY();
 
+	UPROPERTY()
 	int32 q;
+	UPROPERTY()
 	int32 r;
+	UPROPERTY()
 	int32 s;
 
+	UPROPERTY()
 	bool Occupied = false;
+	UPROPERTY()
 	EOccupancyStates OccupancyState = EOccupancyStates::Free;
-
+	UPROPERTY()
 	int32 TeamId = 0;
+	UPROPERTY()
 	int32 Index = -1;
 
 	FHex(int32 Inq, int32 Inr, int32 Ins)

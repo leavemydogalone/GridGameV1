@@ -25,6 +25,9 @@ class GRIDV1_API IGridInterface
 public:
 
 	UFUNCTION()
+	virtual FLayout GetLayout() = 0;
+
+	UFUNCTION()
 	virtual FVector2D GetHexCenterAtLocation(FVector Location) = 0;
 
 	UFUNCTION()

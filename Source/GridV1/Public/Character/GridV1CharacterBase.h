@@ -36,6 +36,7 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_TargetHexCenter)
 	FVector TargetHexCenter = FVector::ZeroVector;
 	FVector CurrentHexCenter = FVector::ZeroVector;
+	FHex CurrentHex = FHex(0, 0, 0);
 	FVector CurrentDestination = FVector::ZeroVector;
 	FVector2D CachedMovementTarget = FVector2D::ZeroVector;
 
@@ -55,8 +56,7 @@ private:
 	void HandleMove();
 
 	UFUNCTION(Server, Reliable)
-	void Server_TryMoveIntoTargetHex();
-
+	void Server_TryMoveIntoTargetHex(const FHex& TargetHex);
 	UFUNCTION()
 	void OnRep_TargetHexCenter();
 

@@ -40,6 +40,11 @@ void AGrid::BeginPlay()
 	SpawnGrid();
 }
 
+FLayout AGrid::GetLayout()
+{
+	return GridLayout;
+}
+
 FVector2D AGrid::GetHexCenterAtLocation(FVector Location)
 {
 	FHex Hex = UGridFunctionLibrary::pixel_to_hex_rounded(GridLayout, FVector2D(Location.X, Location.Y));

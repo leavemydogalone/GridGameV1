@@ -18,12 +18,11 @@ void AGridV1CharacterBase::HandleMovementDirectionInput(const int32 Direction)
 {
     if (!GetGridInterface()) return;
 
-    //Convert the direction into temporary target hex location
-    CachedMovementTarget = GetGridInterface()->GetNextHexCenter(GetActorLocation(), Direction);
+    CurrentHex = UGridFunctionLibrary::pixel_to_hex_rounded(GetGridInterface()->GetLayout(), UGridFunctionLibrary::Convert3DTo2D(GetActorLocation()));
 
-    DrawDebugSphere(GetWorld(), UGridFunctionLibrary::Convert2DTo3DActorHeight(CachedMovementTarget, GetActorLocation()), 50.f, 12, FColor::Red, false, 0.5f);
+	FHex DestinationHex = UGridFunctionLibrary::hex_neighbor(CurrentHex, Direction);
 
-    Server_TryMoveIntoTargetHex();
+    Server_TryMoveIntoTargetHex(DestinationHex);
 
 }
 
@@ -31,8 +30,7 @@ void AGridV1CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-    const FVector2D HexLocation2D = GetGridInterface()->GetHexCenterAtLocation(GetActorLocation());
-	CurrentHexCenter = FVector(HexLocation2D.X, HexLocation2D.Y, GetActorLocation().Z);
+    CurrentHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(GetGridInterface()->GetHexCenterAtLocation(GetActorLocation()), GetActorLocation());
         
 }
 
@@ -45,7 +43,7 @@ void AGridV1CharacterBase::Tick(float DeltaTime)
 
 void AGridV1CharacterBase::HandleMove()
 {
-    if (TargetHexCenter == FVector::ZeroVector || !bIsMoving)
+    if (TargetHexCenter == FVector::ZeroVector)
     {
         return;
     }
@@ -78,29 +76,25 @@ void AGridV1CharacterBase::HandleMove()
 }
 
 
-void AGridV1CharacterBase::Server_TryMoveIntoTargetHex_Implementation()
+void AGridV1CharacterBase::Server_TryMoveIntoTargetHex_Implementation(const FHex& TargetHex)
 {
-    FHex CurrentHex = GetGridInterface()->GetHexAtLocation(UGridFunctionLibrary::Convert3DTo2D(GetActorLocation()));
-    FHex TargetHex = GetGridInterface()->GetHexAtLocation(CachedMovementTarget);
-
     if (GetGridInterface())
     {
         if (GetGridInterface()->TryEnterHex(CurrentHex, TargetHex))
         {
-            TargetHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(CachedMovementTarget, GetActorLocation());
+			TargetHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(UGridFunctionLibrary::hex_to_pixel(GetGridInterface()->GetLayout(), TargetHex), GetActorLocation());
 			bIsMoving = true;
-            OnRep_TargetHexCenter();
-            CachedMovementTarget = FVector2D::ZeroVector;
+
         }
         else {
-            CachedMovementTarget = FVector2D::ZeroVector;
+
         }
     }
 }
 
 void AGridV1CharacterBase::OnRep_TargetHexCenter()
 {
-    TargetHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(CachedMovementTarget, GetActorLocation());
+    //TargetHexCenter = UGridFunctionLibrary::Convert2DTo3DActorHeight(CachedMovementTarget, GetActorLocation());
     bIsMoving = true;
 }
 
