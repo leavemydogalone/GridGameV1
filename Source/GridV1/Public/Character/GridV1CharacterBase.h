@@ -6,10 +6,14 @@
 #include "GameFramework/Character.h"
 #include "Grid/Data/GridTypes.h"
 #include "Interaction/GridInterface.h"
+#include "AbilitySystem/Data/AbilitySystemData.h"
+#include "AbilitySystemInterface.h"
 #include "GridV1CharacterBase.generated.h"
 
-UCLASS()
-class GRIDV1_API AGridV1CharacterBase : public ACharacter
+class UCustomAbilitySystemComponent;
+
+UCLASS(Abstract, NotBlueprintable)
+class GRIDV1_API AGridV1CharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -21,11 +25,38 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 
+	// Implement the IAbilitySystemInterface. (This is used to find the Ability System Component.)
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UFUNCTION(BlueprintPure, Category = "Ability System")
+	UCustomAbilitySystemComponent* GetCustomAbilitySystemComponent() const;
+
+	void InitializeAbilitySystem();
+
+	// This event is fired after Ability System Component initialization is finished.
+	UFUNCTION(BlueprintNativeEvent)
+	void PostInitializeAbilitySystem();
+
+	UFUNCTION(BlueprintPure)
+	const FAbilitySystemInitializationData& GetAbilitySystemInitializationData() const
+	{
+		return AbilitySystemInitializationData;
+	}
+
 protected:
 	virtual void BeginPlay() override;
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// Data used to initialize the Ability System Component. (Can be found in "AbilitySystemData.h")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System", Meta = (ShowOnlyInnerProperties))
+	FAbilitySystemInitializationData AbilitySystemInitializationData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCustomAbilitySystemComponent> AbilitySystemComponent;
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_Controller() override;
 
 private:
     
@@ -41,9 +72,10 @@ private:
 	UPROPERTY(Replicated)
 	FHex CurrentHex = FHex(0, 0, 0);
 
+	UPROPERTY(Replicated)
 	bool bIsMoving = false;
 
-	UPROPERTY(ReplicatedUsing = OnRep_MovementScale, EditAnywhere, Category = "Grid | Movement")
+	UPROPERTY(Replicated, EditAnywhere, Category = "Grid | Movement")
 	float MovementScale = 2.f;
 
 	UPROPERTY(EditAnywhere, Category = "Grid | Movement")

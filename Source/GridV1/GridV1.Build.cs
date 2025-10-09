@@ -8,8 +8,24 @@ public class GridV1 : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput" });
+        PublicDependencyModuleNames.AddRange(new string[] { 
+            "Core", 
+            "CoreUObject", 
+            "Engine", 
+            "InputCore", 
+            "NavigationSystem", 
+            "AIModule", 
+            "Niagara", 
+            "EnhancedInput",
+            "GameplayAbilities", 
+            "NetCore", 
+            "StructUtils"
+        });
 
-        PrivateDependencyModuleNames.AddRange(new string[] { "GameplayTags" });
+
+        PrivateDependencyModuleNames.AddRange(new string[] { 
+            "GameplayTags",
+            "GameplayTasks",
+        });
     }
 }

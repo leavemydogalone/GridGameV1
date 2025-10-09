@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"EnhancedInput",
-				"DeveloperSettings"
+				"DeveloperSettings",
+				"GameplayAbilities"
 			]
 		}
 	],
@@ -22,6 +23,10 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
 		}
 	]
 }
